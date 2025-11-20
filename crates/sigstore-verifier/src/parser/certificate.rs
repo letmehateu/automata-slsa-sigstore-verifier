@@ -29,10 +29,18 @@ pub fn extract_issuer_cn(cert: &X509Certificate) -> Result<String, CertificateEr
     for rdn in issuer.iter() {
         for attr in rdn.iter() {
             if attr.attr_type() == &oid_registry::OID_X509_COMMON_NAME {
+                // Try as_str() first (for UTF8String), fall back to manual conversion
+                // This handles both PrintableString (Tag 19) and UTF8String (Tag 12)
                 return attr
-                    .attr_value()
                     .as_str()
                     .map(|s| s.to_string())
+                    .or_else(|_| {
+                        // If as_str() fails, try to convert the raw bytes to UTF-8
+                        let bytes = attr.as_slice();
+                        std::str::from_utf8(bytes)
+                            .map(|s| s.to_string())
+                            .map_err(|e| CertificateError::ParseError(e.to_string()))
+                    })
                     .map_err(|e| CertificateError::ParseError(e.to_string()));
             }
         }

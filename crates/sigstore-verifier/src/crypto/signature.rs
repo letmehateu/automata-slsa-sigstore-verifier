@@ -16,6 +16,34 @@ impl PublicKey {
         let spki = cert.public_key();
         let algorithm_oid = &spki.algorithm.algorithm;
 
+        // Check if this is an EC public key (1.2.840.10045.2.1)
+        if algorithm_oid.to_id_string() == "1.2.840.10045.2.1" {
+            // For EC keys, the curve is specified in the parameters
+            if let Some(params) = &spki.algorithm.parameters {
+                if let Ok(curve_oid) = params.as_oid() {
+                    match curve_oid.to_id_string().as_str() {
+                        "1.2.840.10045.3.1.7" => {
+                            // secp256r1 (P-256)
+                            let key_bytes = &spki.subject_public_key.data;
+                            let verifying_key = P256VerifyingKey::from_sec1_bytes(key_bytes)
+                                .map_err(|e| SignatureError::PublicKeyParse(e.to_string()))?;
+                            return Ok(PublicKey::P256(verifying_key));
+                        }
+                        "1.3.132.0.34" => {
+                            // secp384r1 (P-384)
+                            let key_bytes = &spki.subject_public_key.data;
+                            let verifying_key = P384VerifyingKey::from_sec1_bytes(key_bytes)
+                                .map_err(|e| SignatureError::PublicKeyParse(e.to_string()))?;
+                            return Ok(PublicKey::P384(verifying_key));
+                        }
+                        oid => return Err(SignatureError::UnsupportedAlgorithm(format!("EC curve: {}", oid))),
+                    }
+                }
+            }
+            return Err(SignatureError::UnsupportedAlgorithm("EC key without curve parameters".to_string()));
+        }
+
+        // Legacy support: try matching the algorithm OID directly (for older formats)
         match algorithm_oid.to_id_string().as_str() {
             "1.2.840.10045.3.1.7" => {
                 // secp256r1 (P-256)
