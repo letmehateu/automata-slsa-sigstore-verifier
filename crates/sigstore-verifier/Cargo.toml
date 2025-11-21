@@ -14,9 +14,15 @@ x509-parser = "0.18"
 p256 = { version = "0.13", features = ["ecdsa", "pem"] }
 p384 = { version = "0.13", features = ["ecdsa", "pem"] }
 ecdsa = "0.16"
+# RSA support
+rsa = { version = "0.9", features = ["sha2"] }
 # HTTP client
 reqwest = { version = "0.12", features = ["blocking", "json"] }
 chrono = "0.4"
 thiserror = "2.0"
 asn1-rs = "0.6"
 pem = "3.0"
+# RFC 3161 / PKCS7 support
+cms = "0.2"
+der = "0.7"
+x509-cert = "0.2"

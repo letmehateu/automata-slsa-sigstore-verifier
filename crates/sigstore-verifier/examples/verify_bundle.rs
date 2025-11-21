@@ -40,7 +40,7 @@ fn main() {
     let fulcio_issuer_chain =
         fetch_trust_bundle(&fulcio_instance).expect("Failed to fetch Fulcio trust bundle");
 
-    match verifier.verify_bundle(&bundle_path, &fulcio_issuer_chain, options) {
+    match verifier.verify_bundle(&bundle_path, options, &fulcio_issuer_chain, None) {
         Ok(result) => {
             println!("✓ Verification SUCCESS\n");
 

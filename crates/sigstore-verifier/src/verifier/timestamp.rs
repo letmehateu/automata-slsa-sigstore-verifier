@@ -1,45 +1,39 @@
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
 use chrono::{DateTime, Utc};
 use x509_parser::prelude::*;
 
-use crate::error::{CertificateError, TimestampError, VerificationError};
-use crate::parser::parse_integrated_time;
+use crate::error::{CertificateError, TimestampError};
+use crate::parser::{parse_integrated_time, rfc3161::parse_rfc3161_timestamp};
 use crate::types::{SigstoreBundle, TransparencyLogEntry};
 
-pub fn get_signing_time(bundle: &SigstoreBundle) -> Result<DateTime<Utc>, VerificationError> {
-    // Check if bundle has RFC3161 timestamps
-    let has_rfc3161 = bundle
+/// Extract signing time from RFC 3161 timestamp
+pub fn get_rfc3161_time(bundle: &SigstoreBundle) -> Result<DateTime<Utc>, TimestampError> {
+    let rfc3161_timestamps = bundle
         .verification_material
         .timestamp_verification_data
         .as_ref()
         .and_then(|td| td.rfc3161_timestamps.as_ref())
-        .map(|ts| !ts.is_empty())
-        .unwrap_or(false);
+        .ok_or_else(|| TimestampError::Rfc3161Parse("No RFC3161 timestamps in bundle".to_string()))?;
 
-    // Check if bundle has transparency log entries
-    let has_tlog = bundle
-        .verification_material
-        .tlog_entries
-        .as_ref()
-        .map(|entries| !entries.is_empty())
-        .unwrap_or(false);
-
-    // RFC3161 timestamp verification is not yet implemented
-    // See RFC-3161.md for implementation requirements
-    if has_rfc3161 && !has_tlog {
-        return Err(TimestampError::Rfc3161NotSupported.into());
+    if rfc3161_timestamps.is_empty() {
+        return Err(TimestampError::Rfc3161Parse("Empty RFC3161 timestamps array".to_string()));
     }
 
-    // Use integrated time from transparency log
-    if let Some(ref tlog_entries) = bundle.verification_material.tlog_entries {
-        if let Some(entry) = tlog_entries.first() {
-            return get_integrated_time(entry).map_err(|e| e.into());
-        }
-    }
+    // Use the first timestamp
+    let timestamp = &rfc3161_timestamps[0];
 
-    Err(TimestampError::NoTimestamp.into())
+    // Decode the base64-encoded timestamp
+    let timestamp_der = BASE64
+        .decode(&timestamp.signed_timestamp)
+        .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to decode timestamp base64: {}", e)))?;
+
+    // Parse the RFC 3161 timestamp token
+    let parsed_timestamp = parse_rfc3161_timestamp(&timestamp_der)?;
+
+    Ok(parsed_timestamp.tst_info.gen_time)
 }
 
-fn get_integrated_time(entry: &TransparencyLogEntry) -> Result<DateTime<Utc>, TimestampError> {
+pub fn get_integrated_time(entry: &TransparencyLogEntry) -> Result<DateTime<Utc>, TimestampError> {
     parse_integrated_time(&entry.integrated_time)
 }
 

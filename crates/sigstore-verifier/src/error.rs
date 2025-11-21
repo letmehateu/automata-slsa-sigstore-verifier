@@ -87,6 +87,9 @@ pub enum TimestampError {
     #[error("No timestamp found (neither RFC3161 nor integrated time)")]
     NoTimestamp,
 
+    #[error("Bundle contains both RFC3161 timestamps and Rekor entries. Only one timestamp mechanism is allowed.")]
+    BothTimestampMechanisms,
+
     #[error("RFC3161 timestamp verification is not yet supported. This bundle requires RFC3161 support. See RFC-3161.md for implementation details.")]
     Rfc3161NotSupported,
 
@@ -95,6 +98,18 @@ pub enum TimestampError {
 
     #[error("RFC3161 timestamp signature verification failed")]
     Rfc3161SignatureInvalid,
+
+    #[error("Message imprint mismatch: expected {expected}, got {actual}")]
+    MessageImprintMismatch { expected: String, actual: String },
+
+    #[error("Unsupported hash algorithm in RFC3161 timestamp: {0}")]
+    UnsupportedHashAlgorithm(String),
+
+    #[error("TSA certificate chain is required but not provided. RFC3161 timestamp does not contain embedded certificates.")]
+    MissingTSAChain,
+
+    #[error("Invalid TSA certificate: {0}")]
+    InvalidTSACertificate(String),
 
     #[error("Invalid integrated time")]
     InvalidIntegratedTime,

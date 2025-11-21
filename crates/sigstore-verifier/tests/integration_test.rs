@@ -15,8 +15,8 @@ fn test_verify_rekor_bundle() {
 
     // Auto-detect Fulcio instance from bundle
     let bundle_json = std::fs::read_to_string(&path).expect("Failed to read bundle");
-    let instance = FulcioInstance::from_bundle_json(&bundle_json)
-        .expect("Failed to detect Fulcio instance");
+    let instance =
+        FulcioInstance::from_bundle_json(&bundle_json).expect("Failed to detect Fulcio instance");
 
     // Fetch trust bundle for detected instance
     // In production, the client should fetch and cache this
@@ -30,7 +30,7 @@ fn test_verify_rekor_bundle() {
         expected_subject: None,
     };
 
-    let result = verifier.verify_bundle(&path, &trust_bundle, options);
+    let result = verifier.verify_bundle(&path, options, &trust_bundle, None);
     assert!(result.is_ok(), "Verification failed: {:?}", result.err());
 
     if let Ok(verification_result) = result {

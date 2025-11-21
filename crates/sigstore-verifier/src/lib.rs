@@ -8,11 +8,14 @@ pub mod verifier;
 use std::path::Path;
 
 use error::VerificationError;
-use parser::{extract_oidc_identity, parse_bundle_from_bytes, parse_bundle_from_path, parse_dsse_payload};
+use parser::{
+    extract_oidc_identity, parse_bundle_from_bytes, parse_bundle_from_path, parse_dsse_payload,
+};
 use types::{CertificateChain, VerificationOptions, VerificationResult};
 use verifier::{
-    get_signing_time, verify_certificate_chain, verify_dsse_signature,
-    verify_signing_time_in_validity, verify_subject_digest, verify_transparency_log,
+    timestamp::{get_integrated_time, get_rfc3161_time},
+    verify_certificate_chain, verify_dsse_signature, verify_signing_time_in_validity,
+    verify_subject_digest, verify_transparency_log,
 };
 
 /// Main attestation verifier
@@ -30,8 +33,9 @@ impl AttestationVerifier {
     /// # Arguments
     ///
     /// * `bundle_path` - Path to the sigstore bundle JSON file
-    /// * `trust_bundle` - Certificate chain (intermediates and root) for verification
     /// * `options` - Verification options
+    /// * `trust_bundle` - Certificate chain (intermediates and root) for verification
+    /// * `tsa_cert_chain` - Optional TSA certificate chain for RFC 3161 timestamp verification
     ///
     /// # Returns
     ///
@@ -43,11 +47,12 @@ impl AttestationVerifier {
     pub fn verify_bundle(
         &self,
         bundle_path: &Path,
-        trust_bundle: &CertificateChain,
         options: VerificationOptions,
+        trust_bundle: &CertificateChain,
+        tsa_cert_chain: Option<&CertificateChain>,
     ) -> Result<VerificationResult, VerificationError> {
         let bundle = parse_bundle_from_path(bundle_path)?;
-        self.verify_bundle_internal(&bundle, trust_bundle, options)
+        self.verify_bundle_internal(&bundle, options, trust_bundle, tsa_cert_chain)
     }
 
     /// Verify a sigstore bundle from raw JSON bytes
@@ -55,8 +60,9 @@ impl AttestationVerifier {
     /// # Arguments
     ///
     /// * `bundle_json` - Raw JSON bytes of the sigstore bundle
-    /// * `trust_bundle` - Certificate chain (intermediates and root) for verification
     /// * `options` - Verification options
+    /// * `trust_bundle` - Certificate chain (intermediates and root) for verification
+    /// * `tsa_cert_chain` - Optional TSA certificate chain for RFC 3161 timestamp verification
     ///
     /// # Returns
     ///
@@ -68,25 +74,57 @@ impl AttestationVerifier {
     pub fn verify_bundle_bytes(
         &self,
         bundle_json: &[u8],
-        trust_bundle: &CertificateChain,
         options: VerificationOptions,
+        trust_bundle: &CertificateChain,
+        tsa_cert_chain: Option<&CertificateChain>,
     ) -> Result<VerificationResult, VerificationError> {
         let bundle = parse_bundle_from_bytes(bundle_json)?;
-        self.verify_bundle_internal(&bundle, trust_bundle, options)
+        self.verify_bundle_internal(&bundle, options, trust_bundle, tsa_cert_chain)
     }
 
     fn verify_bundle_internal(
         &self,
         bundle: &types::SigstoreBundle,
-        trust_bundle: &CertificateChain,
         options: VerificationOptions,
+        trust_bundle: &CertificateChain,
+        tsa_cert_chain: Option<&CertificateChain>,
     ) -> Result<VerificationResult, VerificationError> {
         // Step 1: Parse and verify subject digest
         let statement = parse_dsse_payload(&bundle.dsse_envelope)?;
         let subject_digest = verify_subject_digest(&statement, options.expected_digest.as_deref())?;
 
-        // Step 2: Get signing time (from integrated time - RFC3161 not yet supported)
-        let signing_time = get_signing_time(bundle)?;
+        // Step 2: Validate exactly one timestamp mechanism and get signing time
+        let has_rfc3161 = bundle
+            .verification_material
+            .timestamp_verification_data
+            .as_ref()
+            .and_then(|td| td.rfc3161_timestamps.as_ref())
+            .map(|ts| !ts.is_empty())
+            .unwrap_or(false);
+
+        let has_tlog = bundle
+            .verification_material
+            .tlog_entries
+            .as_ref()
+            .map(|entries| !entries.is_empty())
+            .unwrap_or(false);
+
+        // If RFC 3161, validate TSA chain is available
+        if has_rfc3161 && tsa_cert_chain.is_none() {
+            // TODO: In the future, we could try to extract embedded certs from the timestamp
+            // For now, we require the user to provide the TSA chain
+            return Err(error::TimestampError::MissingTSAChain.into());
+        }
+
+        // Get signing time from appropriate mechanism
+        let signing_time = match (has_rfc3161, has_tlog) {
+            (true, true) => return Err(error::TimestampError::BothTimestampMechanisms.into()),
+            (false, false) => return Err(error::TimestampError::NoTimestamp.into()),
+            (true, false) => get_rfc3161_time(bundle)?,
+            (false, true) => get_integrated_time(
+                &bundle.verification_material.tlog_entries.as_ref().unwrap()[0],
+            )?,
+        };
 
         // Step 3: Verify certificate chain and get hashes
         let (chain, certificate_hashes) = verify_certificate_chain(bundle, trust_bundle)?;
@@ -99,8 +137,21 @@ impl AttestationVerifier {
         // Step 4: Verify DSSE signature
         verify_dsse_signature(&bundle.dsse_envelope, &chain)?;
 
-        // Step 5: Verify transparency log
-        verify_transparency_log(bundle)?;
+        // Step 5: Verify timestamp mechanism (RFC 3161 OR Rekor, mutually exclusive)
+        if has_rfc3161 {
+            // RFC 3161 path: verify TSA chain and timestamp signature
+            let tsa_chain = tsa_cert_chain.unwrap(); // Safe: validated in Step 2
+
+            // Verify TSA certificate chain and EKU
+            verifier::verify_tsa_certificate_chain(tsa_chain)?;
+
+            // Verify RFC 3161 timestamp token (message imprint + PKCS7 signature)
+            let signature_b64 = &bundle.dsse_envelope.signatures[0].sig;
+            verifier::verify_rfc3161_timestamp(bundle, signature_b64, tsa_chain)?;
+        } else {
+            // Rekor path: verify transparency log
+            verify_transparency_log(bundle)?;
+        }
 
         // Step 6: Extract OIDC identity from certificate extensions
         let oidc_identity = extract_oidc_identity(&leaf_cert).ok();
