@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 #[test]
 #[ignore] // Requires network access to fetch trust bundles
-fn test_verify_real_bundle() {
+fn test_verify_rekor_bundle() {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.pop();
@@ -25,8 +25,7 @@ fn test_verify_real_bundle() {
     let verifier = AttestationVerifier::new();
     let options = VerificationOptions {
         expected_digest: None,
-        verify_rekor: true,
-        allow_insecure_sct: false,
+        allow_insecure_sct: false, // Not yet implemented
         expected_issuer: None,
         expected_subject: None,
     };

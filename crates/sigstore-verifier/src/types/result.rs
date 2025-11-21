@@ -25,9 +25,24 @@ impl CertificateChainHashes {
 
 #[derive(Debug, Clone, Default)]
 pub struct VerificationOptions {
+    /// Optional expected digest to verify against the subject digest in the attestation
     pub expected_digest: Option<Vec<u8>>,
-    pub verify_rekor: bool,
+
+    /// Allow certificates without valid SCT (Signed Certificate Timestamp) verification
+    ///
+    /// **NOT YET IMPLEMENTED** - This field is reserved for future Certificate Transparency verification.
+    ///
+    /// When implemented, this will control whether to require valid SCTs embedded in the
+    /// Fulcio certificate. SCTs prove that the certificate was logged in Certificate
+    /// Transparency logs, providing an additional audit trail.
+    ///
+    /// - `false` (recommended): Require valid SCT verification (stricter security policy)
+    /// - `true`: Skip SCT verification (more permissive, current behavior)
     pub allow_insecure_sct: bool,
+
+    /// Optional expected OIDC issuer (e.g., "https://token.actions.githubusercontent.com")
     pub expected_issuer: Option<String>,
+
+    /// Optional expected OIDC subject (e.g., "repo:owner/repo:ref:refs/heads/main")
     pub expected_subject: Option<String>,
 }

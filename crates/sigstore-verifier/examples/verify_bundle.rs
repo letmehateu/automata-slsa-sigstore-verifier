@@ -32,7 +32,6 @@ fn main() {
 
     let options = VerificationOptions {
         expected_digest: None,
-        verify_rekor: false, // Set to true to verify Rekor inclusion
         allow_insecure_sct: false,
         expected_issuer: None,
         expected_subject: None,

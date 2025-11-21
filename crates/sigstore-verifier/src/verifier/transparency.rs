@@ -3,14 +3,16 @@ use crate::error::{TransparencyError, VerificationError};
 use crate::parser::decode_base64;
 use crate::types::SigstoreBundle;
 
-pub fn verify_transparency_log(
-    bundle: &SigstoreBundle,
-    skip_verification: bool,
-) -> Result<(), VerificationError> {
-    if skip_verification {
-        return Ok(());
-    }
-
+/// Verify the Rekor transparency log inclusion proof
+///
+/// This verification ensures that:
+/// 1. The bundle contains transparency log entries
+/// 2. The inclusion proof is valid (Merkle tree verification)
+/// 3. The entry was properly logged in Rekor
+///
+/// This provides protection against backdating attacks and ensures the signature
+/// was publicly logged in an immutable transparency log.
+pub fn verify_transparency_log(bundle: &SigstoreBundle) -> Result<(), VerificationError> {
     let tlog_entries = bundle
         .verification_material
         .tlog_entries
@@ -71,7 +73,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_skip_verification() {
+    fn test_missing_tlog_entries() {
         let bundle = SigstoreBundle {
             media_type: String::new(),
             verification_material: crate::types::VerificationMaterial {
@@ -88,7 +90,10 @@ mod tests {
             },
         };
 
-        let result = verify_transparency_log(&bundle, true);
-        assert!(result.is_ok());
+        let result = verify_transparency_log(&bundle);
+        assert!(matches!(
+            result,
+            Err(VerificationError::Transparency(TransparencyError::NoRekorEntry))
+        ));
     }
 }

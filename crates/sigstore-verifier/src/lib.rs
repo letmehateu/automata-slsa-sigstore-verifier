@@ -99,8 +99,8 @@ impl AttestationVerifier {
         // Step 4: Verify DSSE signature
         verify_dsse_signature(&bundle.dsse_envelope, &chain)?;
 
-        // Step 5: Verify transparency log (if enabled)
-        verify_transparency_log(bundle, !options.verify_rekor)?;
+        // Step 5: Verify transparency log
+        verify_transparency_log(bundle)?;
 
         // Step 6: Extract OIDC identity from certificate extensions
         let oidc_identity = extract_oidc_identity(&leaf_cert).ok();
