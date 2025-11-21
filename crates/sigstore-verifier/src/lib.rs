@@ -9,15 +9,17 @@ pub mod verifier;
 use std::path::Path;
 
 use error::VerificationError;
-use parser::{
-    extract_oidc_identity, parse_bundle_from_bytes, parse_bundle_from_path, parse_dsse_payload,
-};
-use types::{CertificateChain, VerificationOptions, VerificationResult};
-use verifier::{
-    timestamp::{get_integrated_time, get_rfc3161_time},
-    verify_certificate_chain, verify_dsse_signature, verify_signing_time_in_validity,
-    verify_subject_digest, verify_transparency_log,
-};
+use parser::bundle::{parse_bundle_from_bytes, parse_bundle_from_path, parse_dsse_payload};
+use parser::certificate::parse_der_certificate;
+use parser::identity::extract_oidc_identity;
+use types::certificate::CertificateChain;
+use types::result::{VerificationOptions, VerificationResult};
+use verifier::certificate::{verify_certificate_chain, verify_tsa_certificate_chain};
+use verifier::rfc3161::verify_rfc3161_timestamp;
+use verifier::signature::verify_dsse_signature;
+use verifier::subject::verify_subject_digest;
+use verifier::timestamp::{get_integrated_time, get_rfc3161_time, verify_signing_time_in_validity};
+use verifier::transparency::verify_transparency_log;
 
 /// Main attestation verifier
 #[derive(Debug, Clone, Default)]
@@ -85,7 +87,7 @@ impl AttestationVerifier {
 
     fn verify_bundle_internal(
         &self,
-        bundle: &types::SigstoreBundle,
+        bundle: &types::bundle::SigstoreBundle,
         options: VerificationOptions,
         trust_bundle: &CertificateChain,
         tsa_cert_chain: Option<&CertificateChain>,
@@ -131,7 +133,7 @@ impl AttestationVerifier {
         let (chain, certificate_hashes) = verify_certificate_chain(bundle, trust_bundle)?;
 
         // Step 3b: Verify signing time is within certificate validity period
-        let leaf_cert = parser::parse_der_certificate(&chain.leaf)
+        let leaf_cert = parse_der_certificate(&chain.leaf)
             .map_err(|e| VerificationError::InvalidBundleFormat(e.to_string()))?;
         verify_signing_time_in_validity(&signing_time, &leaf_cert)?;
 
@@ -144,11 +146,11 @@ impl AttestationVerifier {
             let tsa_chain = tsa_cert_chain.unwrap(); // Safe: validated in Step 2
 
             // Verify TSA certificate chain and EKU
-            verifier::verify_tsa_certificate_chain(tsa_chain)?;
+            verify_tsa_certificate_chain(tsa_chain)?;
 
             // Verify RFC 3161 timestamp token (message imprint + PKCS7 signature)
             let signature_b64 = &bundle.dsse_envelope.signatures[0].sig;
-            verifier::verify_rfc3161_timestamp(bundle, signature_b64, tsa_chain)?;
+            verify_rfc3161_timestamp(bundle, signature_b64, tsa_chain)?;
         } else {
             // Rekor path: verify transparency log
             verify_transparency_log(bundle)?;

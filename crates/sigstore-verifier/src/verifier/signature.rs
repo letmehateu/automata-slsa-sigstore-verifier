@@ -1,7 +1,9 @@
-use crate::crypto::PublicKey;
+use crate::crypto::signature::PublicKey;
 use crate::error::VerificationError;
-use crate::parser::{decode_base64, parse_der_certificate};
-use crate::types::{CertificateChain, DsseEnvelope};
+use crate::parser::bundle::decode_base64;
+use crate::parser::certificate::parse_der_certificate;
+use crate::types::bundle::DsseEnvelope;
+use crate::types::certificate::CertificateChain;
 
 const DSSE_PREFIX: &[u8] = b"DSSEv1";
 

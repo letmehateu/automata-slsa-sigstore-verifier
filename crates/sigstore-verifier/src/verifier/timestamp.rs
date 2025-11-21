@@ -3,8 +3,9 @@ use chrono::{DateTime, Utc};
 use x509_parser::prelude::*;
 
 use crate::error::{CertificateError, TimestampError};
-use crate::parser::{parse_integrated_time, rfc3161::parse_rfc3161_timestamp};
-use crate::types::{SigstoreBundle, TransparencyLogEntry};
+use crate::parser::rfc3161::parse_rfc3161_timestamp;
+use crate::parser::timestamp::parse_integrated_time;
+use crate::types::bundle::{SigstoreBundle, TransparencyLogEntry};
 
 /// Extract signing time from RFC 3161 timestamp
 pub fn get_rfc3161_time(bundle: &SigstoreBundle) -> Result<DateTime<Utc>, TimestampError> {

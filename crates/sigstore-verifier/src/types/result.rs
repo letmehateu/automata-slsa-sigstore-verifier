@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-
+use serde::{Deserialize, Serialize};
 use super::certificate::OidcIdentity;
 
 #[derive(Debug, Clone)]
@@ -23,7 +23,7 @@ impl CertificateChainHashes {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct VerificationOptions {
     /// Optional expected digest to verify against the subject digest in the attestation
     pub expected_digest: Option<Vec<u8>>,

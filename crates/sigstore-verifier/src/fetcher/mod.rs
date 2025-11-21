@@ -8,5 +8,3 @@
 //! responsible for fetching and providing certificate chains to the verifier.
 
 pub mod trust_bundle;
-
-pub use trust_bundle::*;

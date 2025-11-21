@@ -3,7 +3,7 @@ use x509_parser::prelude::*;
 use x509_parser::oid_registry::Oid;
 
 use crate::error::CertificateError;
-use crate::types::OidcIdentity;
+use crate::types::certificate::OidcIdentity;
 
 // OIDC token claim OIDs (1.3.6.1.4.1.57264.1.x)
 const OID_ISSUER: [u64; 9] = [1, 3, 6, 1, 4, 1, 57264, 1, 8]; // Issuer (v2)

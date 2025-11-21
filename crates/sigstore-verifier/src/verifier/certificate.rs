@@ -1,9 +1,13 @@
 use x509_parser::prelude::*;
 
-use crate::crypto::{sha256, PublicKey};
+use crate::crypto::hash::sha256;
+use crate::crypto::signature::PublicKey;
 use crate::error::CertificateError;
-use crate::parser::{decode_base64, parse_der_certificate};
-use crate::types::{CertificateChain, CertificateChainHashes, SigstoreBundle};
+use crate::parser::bundle::decode_base64;
+use crate::parser::certificate::parse_der_certificate;
+use crate::types::bundle::SigstoreBundle;
+use crate::types::certificate::CertificateChain;
+use crate::types::result::CertificateChainHashes;
 
 /// Verify the certificate chain using provided trust bundle
 ///

@@ -1,7 +1,7 @@
 use x509_parser::prelude::*;
 
 use crate::error::CertificateError;
-use crate::types::FulcioInstance;
+use crate::types::certificate::FulcioInstance;
 
 pub fn parse_der_certificate(der: &[u8]) -> Result<X509Certificate, CertificateError> {
     let (_, cert) = X509Certificate::from_der(der)

@@ -2,7 +2,8 @@ use std::path::Path;
 
 use base64::prelude::*;
 use crate::error::VerificationError;
-use crate::types::{DsseEnvelope, SigstoreBundle, Statement};
+use crate::types::bundle::{DsseEnvelope, SigstoreBundle};
+use crate::types::dsse::Statement;
 
 pub fn parse_bundle_from_path(path: &Path) -> Result<SigstoreBundle, VerificationError> {
     let contents = std::fs::read_to_string(path)
@@ -58,11 +59,13 @@ mod tests {
 
     #[test]
     fn test_validate_bundle_invalid_media_type() {
+        use crate::types::bundle::{Certificate, Signature, VerificationMaterial};
+
         let mut bundle = SigstoreBundle {
             media_type: "invalid".to_string(),
-            verification_material: crate::types::VerificationMaterial {
+            verification_material: VerificationMaterial {
                 timestamp_verification_data: None,
-                certificate: crate::types::Certificate {
+                certificate: Certificate {
                     raw_bytes: String::new(),
                 },
                 tlog_entries: None,
@@ -70,7 +73,7 @@ mod tests {
             dsse_envelope: DsseEnvelope {
                 payload: String::new(),
                 payload_type: String::new(),
-                signatures: vec![crate::types::Signature {
+                signatures: vec![Signature {
                     sig: String::new(),
                 }],
             },

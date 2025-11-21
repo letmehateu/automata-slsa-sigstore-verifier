@@ -1,6 +1,5 @@
-use crate::parser::{
-    decode_base64, determine_fulcio_instance, parse_bundle_from_str, parse_der_certificate,
-};
+use crate::parser::bundle::{decode_base64, parse_bundle_from_str};
+use crate::parser::certificate::{determine_fulcio_instance, parse_der_certificate};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,7 +59,8 @@ impl FulcioInstance {
     /// ```ignore
     /// # #[cfg(feature = "fetcher")]
     /// # {
-    /// use sigstore_verifier::{FulcioInstance, fetcher::fetch_trust_bundle};
+    /// use sigstore_verifier::types::certificate::FulcioInstance;
+    /// use sigstore_verifier::fetcher::trust_bundle::fetch_trust_bundle;
     ///
     /// let bundle_json = std::fs::read_to_string("bundle.sigstore.json")?;
     /// let instance = FulcioInstance::from_bundle_json(&bundle_json)?;

@@ -1,6 +1,6 @@
-use crate::crypto::hex_decode;
+use crate::crypto::hash::hex_decode;
 use crate::error::VerificationError;
-use crate::types::Statement;
+use crate::types::dsse::Statement;
 
 pub fn verify_subject_digest(
     statement: &Statement,
@@ -38,6 +38,7 @@ pub fn verify_subject_digest(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::types::dsse::Subject;
     use std::collections::HashMap;
 
     #[test]
@@ -50,7 +51,7 @@ mod tests {
 
         let statement = Statement {
             statement_type: "test".to_string(),
-            subject: vec![crate::types::Subject {
+            subject: vec![Subject {
                 name: "artifact".to_string(),
                 digest: digest_map,
             }],
@@ -73,7 +74,7 @@ mod tests {
 
         let statement = Statement {
             statement_type: "test".to_string(),
-            subject: vec![crate::types::Subject {
+            subject: vec![Subject {
                 name: "artifact".to_string(),
                 digest: digest_map,
             }],
@@ -95,7 +96,7 @@ mod tests {
 
         let statement = Statement {
             statement_type: "test".to_string(),
-            subject: vec![crate::types::Subject {
+            subject: vec![Subject {
                 name: "artifact".to_string(),
                 digest: digest_map,
             }],

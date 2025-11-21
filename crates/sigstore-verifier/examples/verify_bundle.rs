@@ -1,8 +1,7 @@
-use sigstore_verifier::{
-    fetcher::fetch_trust_bundle,
-    types::{FulcioInstance, VerificationOptions},
-    AttestationVerifier,
-};
+use sigstore_verifier::fetcher::trust_bundle::fetch_trust_bundle;
+use sigstore_verifier::types::certificate::FulcioInstance;
+use sigstore_verifier::types::result::VerificationOptions;
+use sigstore_verifier::AttestationVerifier;
 use std::env;
 use std::path::PathBuf;
 

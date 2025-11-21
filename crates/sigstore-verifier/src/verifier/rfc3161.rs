@@ -2,8 +2,10 @@ use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
 use chrono::{DateTime, Utc};
 
 use crate::error::TimestampError;
+use crate::parser::certificate::parse_der_certificate;
 use crate::parser::rfc3161::{parse_rfc3161_timestamp, MessageImprint, Rfc3161Timestamp};
-use crate::types::{CertificateChain, SigstoreBundle};
+use crate::types::bundle::SigstoreBundle;
+use crate::types::certificate::CertificateChain;
 
 /// Verify RFC 3161 timestamp token
 ///
@@ -134,7 +136,7 @@ fn verify_pkcs7_signature(
         .value();
 
     // Parse the TSA leaf certificate from the chain
-    let tsa_leaf_cert = crate::parser::parse_der_certificate(&tsa_chain.leaf)
+    let tsa_leaf_cert = parse_der_certificate(&tsa_chain.leaf)
         .map_err(|e| TimestampError::InvalidTSACertificate(format!("Failed to parse TSA leaf certificate: {}", e)))?;
 
     // Extract public key from certificate
@@ -259,7 +261,6 @@ fn verify_ecdsa_signature(
     use p256::ecdsa::{Signature as P256Signature, VerifyingKey as P256VerifyingKey};
     use p256::pkcs8::DecodePublicKey as P256DecodePublicKey;
     use p384::ecdsa::{Signature as P384Signature, VerifyingKey as P384VerifyingKey};
-    use p384::pkcs8::DecodePublicKey as P384DecodePublicKey;
 
     // Try P-256 first, then P-384 based on digest length
     match digest.len() {

@@ -1,7 +1,7 @@
-use crate::crypto::verify_inclusion_proof;
+use crate::crypto::merkle::{compute_leaf_hash, verify_inclusion_proof};
 use crate::error::{TransparencyError, VerificationError};
-use crate::parser::decode_base64;
-use crate::types::SigstoreBundle;
+use crate::parser::bundle::decode_base64;
+use crate::types::bundle::SigstoreBundle;
 
 /// Verify the Rekor transparency log inclusion proof
 ///
@@ -50,7 +50,7 @@ pub fn verify_transparency_log(bundle: &SigstoreBundle) -> Result<(), Verificati
         // Compute leaf hash from canonicalized body
         let canonicalized_body = decode_base64(&entry.canonicalized_body)
             .map_err(|_| TransparencyError::InvalidEntryHash)?;
-        let leaf_hash = crate::crypto::compute_leaf_hash(&canonicalized_body);
+        let leaf_hash = compute_leaf_hash(&canonicalized_body);
 
         // Verify inclusion proof
         verify_inclusion_proof(&leaf_hash, log_index, tree_size, &proof_hashes, &root_hash)?;
@@ -71,19 +71,20 @@ pub fn verify_transparency_log(bundle: &SigstoreBundle) -> Result<(), Verificati
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::types::bundle::{Certificate, DsseEnvelope, VerificationMaterial};
 
     #[test]
     fn test_missing_tlog_entries() {
         let bundle = SigstoreBundle {
             media_type: String::new(),
-            verification_material: crate::types::VerificationMaterial {
+            verification_material: VerificationMaterial {
                 timestamp_verification_data: None,
-                certificate: crate::types::Certificate {
+                certificate: Certificate {
                     raw_bytes: String::new(),
                 },
                 tlog_entries: None,
             },
-            dsse_envelope: crate::types::DsseEnvelope {
+            dsse_envelope: DsseEnvelope {
                 payload: String::new(),
                 payload_type: String::new(),
                 signatures: vec![],

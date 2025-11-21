@@ -1,6 +1,6 @@
 use crate::error::CertificateError;
-use crate::parser::parse_pem_certificate;
-use crate::types::{CertificateChain, FulcioInstance, TrustBundle};
+use crate::parser::certificate::parse_pem_certificate;
+use crate::types::certificate::{CertificateChain, FulcioInstance, TrustBundle};
 
 pub fn fetch_trust_bundle(instance: &FulcioInstance) -> Result<CertificateChain, CertificateError> {
     let url = instance.trust_bundle_url();
