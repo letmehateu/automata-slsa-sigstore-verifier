@@ -114,52 +114,6 @@ impl AttestationVerifier {
             .map(|entries| !entries.is_empty())
             .unwrap_or(false);
 
-        // If RFC 3161, try to extract embedded TSA certs (takes precedence over user-provided)
-        let tsa_cert_chain = if has_rfc3161 {
-            let timestamp_data = &bundle
-                .verification_material
-                .timestamp_verification_data
-                .as_ref()
-                .unwrap() // Safe: checked by has_rfc3161
-                .rfc3161_timestamps
-                .as_ref()
-                .unwrap()[0]; // Safe: has_rfc3161 validates non-empty
-
-            // Decode and parse RFC 3161 timestamp
-            let timestamp_der = BASE64
-                .decode(&timestamp_data.signed_timestamp)
-                .map_err(|e| {
-                    VerificationError::InvalidBundleFormat(format!(
-                        "Failed to decode timestamp: {}",
-                        e
-                    ))
-                })?;
-
-            let parsed_timestamp = parse_rfc3161_timestamp(&timestamp_der)?;
-
-            // Try to extract embedded certificates (takes precedence)
-            if let Some(embedded_certs) = parsed_timestamp.certificates {
-                if !embedded_certs.is_empty() {
-                    // Embedded certs found - use them
-                    let embedded_chain = certs_to_chain(embedded_certs).map_err(|e| {
-                        error::TimestampError::InvalidTSACertificate(format!(
-                            "Failed to parse embedded TSA certs: {}",
-                            e
-                        ))
-                    })?;
-                    Some(embedded_chain)
-                } else {
-                    // Empty embedded cert list - fall back to user-provided
-                    tsa_cert_chain.cloned()
-                }
-            } else {
-                // No embedded certs field at all - use user-provided
-                tsa_cert_chain.cloned()
-            }
-        } else {
-            tsa_cert_chain.cloned()
-        };
-
         // Validate we have a TSA chain for RFC 3161 path
         if has_rfc3161 && tsa_cert_chain.is_none() {
             return Err(error::TimestampError::MissingTSAChain.into());
@@ -189,14 +143,55 @@ impl AttestationVerifier {
         // Step 5: Verify timestamp mechanism (RFC 3161 OR Rekor, mutually exclusive)
         if has_rfc3161 {
             // RFC 3161 path: verify TSA chain and timestamp signature
-            let tsa_chain = tsa_cert_chain.as_ref().unwrap(); // Safe: validated in Step 2
+            let tsa_chain = {
+                let timestamp_data = &bundle
+                    .verification_material
+                    .timestamp_verification_data
+                    .as_ref()
+                    .unwrap() // Safe: checked by has_rfc3161
+                    .rfc3161_timestamps
+                    .as_ref()
+                    .unwrap()[0]; // Safe: has_rfc3161 validates non-empty
+
+                // Decode and parse RFC 3161 timestamp
+                let timestamp_der = BASE64
+                    .decode(&timestamp_data.signed_timestamp)
+                    .map_err(|e| {
+                        VerificationError::InvalidBundleFormat(format!(
+                            "Failed to decode timestamp: {}",
+                            e
+                        ))
+                    })?;
+
+                let parsed_timestamp = parse_rfc3161_timestamp(&timestamp_der)?;
+
+                // Try to extract embedded certificates (takes precedence)
+                if let Some(embedded_certs) = parsed_timestamp.certificates {
+                    if !embedded_certs.is_empty() {
+                        // Embedded certs found - use them
+                        let embedded_chain = certs_to_chain(embedded_certs).map_err(|e| {
+                            error::TimestampError::InvalidTSACertificate(format!(
+                                "Failed to parse embedded TSA certs: {}",
+                                e
+                            ))
+                        })?;
+                        embedded_chain
+                    } else {
+                        // Empty embedded cert list - fall back to user-provided
+                        tsa_cert_chain.cloned().unwrap()
+                    }
+                } else {
+                    // No embedded certs field at all - use user-provided
+                    tsa_cert_chain.cloned().unwrap()
+                }
+            };
 
             // Verify TSA certificate chain and EKU
-            verify_tsa_certificate_chain(tsa_chain)?;
+            verify_tsa_certificate_chain(&tsa_chain)?;
 
             // Verify RFC 3161 timestamp token (message imprint + PKCS7 signature)
             let signature_b64 = &bundle.dsse_envelope.signatures[0].sig;
-            verify_rfc3161_timestamp(bundle, signature_b64, tsa_chain)?;
+            verify_rfc3161_timestamp(bundle, signature_b64, &tsa_chain)?;
         } else {
             // Rekor path: verify transparency log
             verify_transparency_log(bundle)?;
