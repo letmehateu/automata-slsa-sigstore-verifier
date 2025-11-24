@@ -7,10 +7,23 @@ homepage.workspace = true
 
 [dependencies]
 risc0-zkvm = { version = "^3.0.3", features = ["unstable"] }
+risc0-ethereum-contracts = { workspace = true }
 sigstore-risc0-methods = { path = "../risc0" }
 sigstore-verifier = { path = "../sigstore-verifier" }
 sigstore-zkvm-traits = { path = "../sigstore-zkvm-traits" }
+boundless-market = { workspace = true }
+
+# CLI and async
+clap = { workspace = true }
+tokio = { workspace = true }
+dotenvy = { workspace = true }
+
+# Utilities
+anyhow = { workspace = true }
+async-trait = { workspace = true }
 base64 = { workspace = true }
 hex = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
+url = { workspace = true }
+bincode = { workspace = true }

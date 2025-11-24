@@ -1,5 +1,7 @@
 #![no_main]
 
+use std::io::Read;
+
 use risc0_zkvm::guest::env;
 risc0_zkvm::guest::entry!(main);
 
@@ -10,7 +12,12 @@ use sigstore_verifier::{
 use sigstore_zkvm_traits::types::ProverInput;
 
 fn main() {
-    let input: ProverInput = env::read();
+    // read the values passed from host
+    let mut input_bytes: Vec<u8> = vec![];
+    env::stdin().read_to_end(&mut input_bytes).unwrap();
+
+    let input: ProverInput = ProverInput::parse_input(&input_bytes)
+        .expect("Failed to parse ProverInput");
 
     let verifier = AttestationVerifier::new();
 

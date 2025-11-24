@@ -36,4 +36,22 @@ impl ProverInput {
             tsa_cert_chain,
         }
     }
+
+    /// Encode the ProverInput to bytes for host-to-guest communication
+    ///
+    /// This method serializes the ProverInput using bincode for efficient
+    /// binary encoding to be passed from the host to the guest program.
+    pub fn encode_input(&self) -> Result<Vec<u8>, String> {
+        bincode::serialize(self)
+            .map_err(|e| format!("Failed to serialize ProverInput: {}", e))
+    }
+
+    /// Parse ProverInput from bytes in the guest program
+    ///
+    /// This method deserializes the ProverInput from the bincode format
+    /// created by encode_input().
+    pub fn parse_input(bytes: &[u8]) -> Result<Self, String> {
+        bincode::deserialize(bytes)
+            .map_err(|e| format!("Failed to deserialize ProverInput: {}", e))
+    }
 }
