@@ -1,0 +1,16 @@
+[package]
+name = "risc0-host"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+homepage.workspace = true
+
+[dependencies]
+risc0-zkvm = { version = "^3.0.3", features = ["unstable"] }
+sigstore-risc0-methods = { path = "../risc0" }
+sigstore-verifier = { path = "../sigstore-verifier" }
+sigstore-zkvm-traits = { path = "../sigstore-zkvm-traits" }
+base64 = { workspace = true }
+hex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
