@@ -83,7 +83,7 @@ impl FulcioInstance {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct OidcIdentity {
     pub issuer: Option<String>,
     pub subject: Option<String>,

@@ -24,5 +24,5 @@ fn main() {
     assert!(output.is_ok(), "Failed to verify bundle");
 
     let verification_result: VerificationResult = output.unwrap();
-    env::commit(&verification_result);
+    env::commit_slice(&verification_result.as_slice());
 }
