@@ -1,0 +1,11 @@
+[package]
+name = "sugstore-sp1-methods"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+sp1-sdk.workspace = true
+
+[build-dependencies]
+sp1-sdk = { workspace = true }
+sp1-build = "5.2.1"
