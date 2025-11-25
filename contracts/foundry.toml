@@ -15,7 +15,14 @@ ffi = true
 remappings = [
     "solady/=lib/solady/src/",
     "@sp1-contracts/=lib/sp1-contracts/contracts/src/",
-    "risc0/=lib/risc0-ethereum/contracts/src/"
+    "risc0/=lib/risc0-ethereum/contracts/src/",
+
+    # RiscZero
+    "openzeppelin/=lib/risc0-ethereum/lib/openzeppelin-contracts/",
+]
+
+fs_permissions = [
+    { access = "read", path = "test/fixtures"},
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
