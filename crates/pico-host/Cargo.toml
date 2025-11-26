@@ -1,0 +1,26 @@
+[package]
+name = "pico-host"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+homepage.workspace = true
+
+[dependencies]
+pico-sdk = { workspace = true }
+p3-field = { workspace = true }
+sigstore-pico-methods = { path = "../pico" }
+sigstore-verifier = { path = "../sigstore-verifier" }
+sigstore-zkvm-traits = { path = "../sigstore-zkvm-traits" }
+
+# CLI and async
+clap = { workspace = true }
+tokio = { workspace = true }
+dotenvy = { workspace = true }
+
+# Utilities
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+hex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+bincode = { workspace = true }

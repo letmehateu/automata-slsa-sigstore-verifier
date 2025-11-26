@@ -1,0 +1,7 @@
+[package]
+name = "sigstore-pico-methods"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+pico-sdk = { workspace = true }

@@ -52,3 +52,7 @@ boundless-market = { version = "^1.0" }
 
 # SP1 Dependencies
 sp1-sdk = { version = "5.2.1" }
+
+# Pico Dependencies
+pico-sdk = { git = "https://github.com/brevis-network/pico", branch = "main" }
+p3-field = { git = "https://github.com/brevis-network/Plonky3.git", rev = "a4d376b" }
