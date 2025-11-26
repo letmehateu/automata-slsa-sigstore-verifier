@@ -7,7 +7,7 @@ use crate::config::BoundlessConfig;
 use anyhow::{Context, Result};
 use boundless_market::{
     alloy::{
-        primitives::U256,
+        primitives::{U256, utils::parse_units},
         providers::{Provider, ProviderBuilder},
         signers::local::PrivateKeySigner,
         transports::http::reqwest::Url,
@@ -86,11 +86,18 @@ pub async fn prove_with_boundless(
     println!("🔑 Building Boundless client...");
 
     // Build client
+    // Assuming 1 ETH = USD 3000
+    // Min Price = $0.30 per GCycles
+    // Max Price = $3.00 per GCycles
     let client = Client::builder()
         .with_rpc_url(rpc_url_parsed)
         .with_deployment(deployment)
         .with_storage_provider(Some(storage_provider))
         .with_private_key(private_key)
+        .config_offer_layer(|config| config
+          .max_price_per_cycle(parse_units("0.001", "gwei").unwrap())
+          .min_price_per_cycle(parse_units("0.0001", "gwei").unwrap())
+        )
         .build()
         .await
         .context("Failed to build Boundless client")?;

@@ -7,7 +7,7 @@ fn main() {
     let mut builder = GuestOptionsBuilder::default();
     if std::env::var("RISC0_USE_DOCKER").is_ok() {
         let docker_options = DockerOptionsBuilder::default()
-            .root_dir(manifest_dir.join("../"))
+            .root_dir(manifest_dir.join("../../"))
             .build()
             .unwrap();
 
