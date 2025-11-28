@@ -15,7 +15,7 @@ use parser::certificate::{certs_to_chain, parse_der_certificate};
 use parser::identity::extract_oidc_identity;
 use parser::rfc3161::parse_rfc3161_timestamp;
 use types::certificate::CertificateChain;
-use types::result::{VerificationOptions, VerificationResult};
+use types::result::{CertificateChainHashes, DigestAlgorithm, TimestampProof, VerificationOptions, VerificationResult};
 use verifier::certificate::{verify_certificate_chain, verify_tsa_certificate_chain};
 use verifier::rfc3161::verify_rfc3161_timestamp;
 use verifier::signature::verify_dsse_signature;
@@ -141,49 +141,47 @@ impl AttestationVerifier {
         verify_dsse_signature(&bundle.dsse_envelope, &chain)?;
 
         // Step 5: Verify timestamp mechanism (RFC 3161 OR Rekor, mutually exclusive)
-        if has_rfc3161 {
+        // and collect timestamp proof data
+        let timestamp_proof = if has_rfc3161 {
             // RFC 3161 path: verify TSA chain and timestamp signature
-            let tsa_chain = {
-                let timestamp_data = &bundle
-                    .verification_material
-                    .timestamp_verification_data
-                    .as_ref()
-                    .unwrap() // Safe: checked by has_rfc3161
-                    .rfc3161_timestamps
-                    .as_ref()
-                    .unwrap()[0]; // Safe: has_rfc3161 validates non-empty
+            let timestamp_data = &bundle
+                .verification_material
+                .timestamp_verification_data
+                .as_ref()
+                .unwrap() // Safe: checked by has_rfc3161
+                .rfc3161_timestamps
+                .as_ref()
+                .unwrap()[0]; // Safe: has_rfc3161 validates non-empty
 
-                // Decode and parse RFC 3161 timestamp
-                let timestamp_der = BASE64
-                    .decode(&timestamp_data.signed_timestamp)
-                    .map_err(|e| {
-                        VerificationError::InvalidBundleFormat(format!(
-                            "Failed to decode timestamp: {}",
+            // Decode and parse RFC 3161 timestamp
+            let timestamp_der = BASE64
+                .decode(&timestamp_data.signed_timestamp)
+                .map_err(|e| {
+                    VerificationError::InvalidBundleFormat(format!(
+                        "Failed to decode timestamp: {}",
+                        e
+                    ))
+                })?;
+
+            let parsed_timestamp = parse_rfc3161_timestamp(&timestamp_der)?;
+
+            // Try to extract embedded certificates (takes precedence)
+            let tsa_chain = if let Some(embedded_certs) = parsed_timestamp.certificates.clone() {
+                if !embedded_certs.is_empty() {
+                    // Embedded certs found - use them
+                    certs_to_chain(embedded_certs).map_err(|e| {
+                        error::TimestampError::InvalidTSACertificate(format!(
+                            "Failed to parse embedded TSA certs: {}",
                             e
                         ))
-                    })?;
-
-                let parsed_timestamp = parse_rfc3161_timestamp(&timestamp_der)?;
-
-                // Try to extract embedded certificates (takes precedence)
-                if let Some(embedded_certs) = parsed_timestamp.certificates {
-                    if !embedded_certs.is_empty() {
-                        // Embedded certs found - use them
-                        let embedded_chain = certs_to_chain(embedded_certs).map_err(|e| {
-                            error::TimestampError::InvalidTSACertificate(format!(
-                                "Failed to parse embedded TSA certs: {}",
-                                e
-                            ))
-                        })?;
-                        embedded_chain
-                    } else {
-                        // Empty embedded cert list - fall back to user-provided
-                        tsa_cert_chain.cloned().unwrap()
-                    }
+                    })?
                 } else {
-                    // No embedded certs field at all - use user-provided
+                    // Empty embedded cert list - fall back to user-provided
                     tsa_cert_chain.cloned().unwrap()
                 }
+            } else {
+                // No embedded certs field at all - use user-provided
+                tsa_cert_chain.cloned().unwrap()
             };
 
             // Verify TSA certificate chain and EKU
@@ -192,10 +190,67 @@ impl AttestationVerifier {
             // Verify RFC 3161 timestamp token (message imprint + PKCS7 signature)
             let signature_b64 = &bundle.dsse_envelope.signatures[0].sig;
             verify_rfc3161_timestamp(bundle, signature_b64, &tsa_chain)?;
+
+            // Compute TSA chain hashes for the timestamp proof
+            use crate::crypto::hash::sha256;
+            let tsa_leaf_hash = sha256(&tsa_chain.leaf);
+            let tsa_intermediate_hashes: Vec<[u8; 32]> = tsa_chain
+                .intermediates
+                .iter()
+                .map(|der| sha256(der))
+                .collect();
+            let tsa_root_hash = sha256(&tsa_chain.root);
+
+            // Extract message imprint algorithm
+            let message_imprint_algorithm = match parsed_timestamp.tst_info.message_imprint.hash_algorithm {
+                parser::rfc3161::HashAlgorithm::Sha256 => DigestAlgorithm::Sha256,
+                parser::rfc3161::HashAlgorithm::Sha384 => DigestAlgorithm::Sha384,
+            };
+
+            TimestampProof::Rfc3161 {
+                tsa_chain_hashes: CertificateChainHashes {
+                    leaf: tsa_leaf_hash,
+                    intermediates: tsa_intermediate_hashes,
+                    root: tsa_root_hash,
+                },
+                message_imprint_algorithm,
+                message_imprint: parsed_timestamp.tst_info.message_imprint.hashed_message.clone(),
+            }
         } else {
             // Rekor path: verify transparency log
             verify_transparency_log(bundle)?;
-        }
+
+            // Extract log_id, log_index (tree), and entry_index from tlog entry
+            let tlog_entry = &bundle.verification_material.tlog_entries.as_ref().unwrap()[0];
+
+            let log_id: [u8; 32] = if let Some(ref log_id_struct) = tlog_entry.log_id {
+                let log_id_bytes = parser::bundle::decode_base64(&log_id_struct.key_id)
+                    .map_err(|e| VerificationError::InvalidBundleFormat(format!(
+                        "Failed to decode log_id: {}", e
+                    )))?;
+                log_id_bytes.try_into().map_err(|_| {
+                    VerificationError::InvalidBundleFormat("log_id is not 32 bytes".to_string())
+                })?
+            } else {
+                [0u8; 32]
+            };
+
+            // Tree leaf index (for Merkle proof verification against checkpoint)
+            let log_index: u64 = tlog_entry
+                .inclusion_proof
+                .as_ref()
+                .and_then(|proof| proof.log_index.parse().ok())
+                .unwrap_or(0);
+
+            // Entry index (for API queries to fetch the full entry)
+            let entry_index: u64 = tlog_entry
+                .log_index
+                .as_ref()
+                .and_then(|idx| idx.parse().ok())
+                .unwrap_or(0);
+
+            TimestampProof::Rekor { log_id, log_index, entry_index }
+        };
 
         // Step 6: Extract OIDC identity from certificate extensions
         let oidc_identity = extract_oidc_identity(&leaf_cert).ok();
@@ -241,7 +296,9 @@ impl AttestationVerifier {
             certificate_hashes,
             signing_time,
             subject_digest,
+            subject_digest_algorithm: DigestAlgorithm::Sha256, // Currently hardcoded to SHA256
             oidc_identity,
+            timestamp_proof,
         })
     }
 }

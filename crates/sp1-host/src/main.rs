@@ -125,8 +125,8 @@ async fn handle_prove(args: crate::cli::ProveArgs) -> Result<()> {
             zkvm: "sp1".to_string(),
             program_id: prover.program_identifier()?,
             circuit_version: crate::prover::Sp1Prover::circuit_version(),
-            journal: hex::encode(&public_values),
-            proof: hex::encode(&proof),
+            journal: format!("0x{}", hex::encode(&public_values)),
+            proof: format!("0x{}", hex::encode(&proof)),
         };
 
         write_proof_artifact(output_path, &artifact)

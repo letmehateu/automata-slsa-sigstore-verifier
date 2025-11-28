@@ -126,8 +126,8 @@ async fn handle_prove(args: crate::cli::ProveArgs) -> Result<()> {
             zkvm: "pico".to_string(),
             program_id: prover.program_identifier()?,
             circuit_version: crate::prover::PicoProver::circuit_version(),
-            journal: hex::encode(&journal),
-            proof: hex::encode(&proof),
+            journal: format!("0x{}", hex::encode(&journal)),
+            proof: format!("0x{}", hex::encode(&proof)),
         };
 
         write_proof_artifact(output_path, &artifact)

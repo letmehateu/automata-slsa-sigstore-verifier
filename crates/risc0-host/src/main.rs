@@ -120,8 +120,8 @@ async fn handle_prove(args: crate::cli::ProveArgs) -> Result<()> {
             zkvm: "risc0".to_string(),
             program_id: prover.program_identifier()?,
             circuit_version: crate::prover::Risc0Prover::circuit_version(),
-            journal: hex::encode(&journal),
-            proof: hex::encode(&seal),
+            journal: format!("0x{}", hex::encode(&journal)),
+            proof: format!("0x{}", hex::encode(&seal)),
         };
 
         write_proof_artifact(output_path, &artifact)

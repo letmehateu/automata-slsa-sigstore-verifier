@@ -16,8 +16,8 @@ contract SigstoreTest is Test {
     SigstoreAttestationVerifier sigstoreVerifier;
     address admin = address(1);
 
-    bytes32 constant RISC0_IMAGE_ID = 0x59c443f59e07f88155939288024ac7eaae58db4db826600f08318e9441795121;
-    bytes32 constant SP1_VKEY = 0x001bf0267a7348bf563502165c5cd9c5c3fd107e34d63b09509fb4ba3b8df48b;
+    bytes32 constant RISC0_IMAGE_ID = 0x9635bbc29e531f8ad7f2cc3fa18dcc7f08b2f74de5a189f2d394e581dcf524f3;
+    bytes32 constant SP1_VKEY = 0x00204312c6f7cbbc6eaf391a6660787279ea049bb7078694d5c62a8c5aa44dc9;
 
     event AttestationSubmitted(ZkCoProcessorType verifierType, bytes output);
 
@@ -72,7 +72,7 @@ contract SigstoreTest is Test {
             "/",
             "fixtures",
             "/",
-            "sp1_github.json"
+            "sp1-github.json"
         );
 
         (bytes memory output, bytes memory proof) = _readFixture(path);

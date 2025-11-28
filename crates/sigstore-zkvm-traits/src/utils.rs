@@ -7,7 +7,7 @@
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use sigstore_verifier::types::result::VerificationResult;
+use sigstore_verifier::types::result::{DigestAlgorithm, TimestampProof, VerificationResult};
 use std::fs;
 use std::path::Path;
 
@@ -76,10 +76,11 @@ pub fn write_proof_artifact(output_path: &Path, artifact: &ProofArtifact) -> Res
 /// Display verification result in a readable format
 ///
 /// Prints the verification result with formatted output including:
-/// - Subject digest
+/// - Subject digest and algorithm
 /// - Signing time
 /// - Certificate hashes (leaf, intermediates, root)
 /// - OIDC identity information (if present)
+/// - Timestamp proof details (RFC 3161 or Rekor)
 ///
 /// # Arguments
 ///
@@ -93,7 +94,11 @@ pub fn write_proof_artifact(output_path: &Path, artifact: &ProofArtifact) -> Res
 /// ```
 pub fn display_verification_result(result: &VerificationResult) {
     println!("\n=== Verification Result ===");
-    println!("Subject digest: {}", hex::encode(&result.subject_digest));
+    println!(
+        "Subject digest: {} ({})",
+        hex::encode(&result.subject_digest),
+        format_digest_algorithm(&result.subject_digest_algorithm)
+    );
     println!("Signing time:   {}", result.signing_time);
 
     println!("\nCertificate Hashes:");
@@ -123,6 +128,50 @@ pub fn display_verification_result(result: &VerificationResult) {
         if let Some(ref event_name) = oidc.event_name {
             println!("  Event:        {}", event_name);
         }
+    }
+
+    // Display timestamp proof information
+    match &result.timestamp_proof {
+        TimestampProof::None => {
+            println!("\nTimestamp Proof: None");
+        }
+        TimestampProof::Rfc3161 {
+            tsa_chain_hashes,
+            message_imprint_algorithm,
+            message_imprint,
+        } => {
+            println!("\nTimestamp Proof: RFC 3161 (TSA)");
+            println!(
+                "  Message Imprint: {} ({})",
+                hex::encode(message_imprint),
+                format_digest_algorithm(message_imprint_algorithm)
+            );
+            println!("  TSA Certificate Chain:");
+            println!("    Leaf: {}", hex::encode(tsa_chain_hashes.leaf));
+            if !tsa_chain_hashes.intermediates.is_empty() {
+                println!("    Intermediates:");
+                for (i, intermediate) in tsa_chain_hashes.intermediates.iter().enumerate() {
+                    println!("      [{}] {}", i, hex::encode(intermediate));
+                }
+            }
+            println!("    Root: {}", hex::encode(tsa_chain_hashes.root));
+        }
+        TimestampProof::Rekor { log_id, log_index, entry_index } => {
+            println!("\nTimestamp Proof: Rekor (Transparency Log)");
+            println!("  Log ID:      {}", hex::encode(log_id));
+            println!("  Entry Index: {} (for API queries)", entry_index);
+            println!("  Log Index:   {} (tree leaf index for Merkle proof)", log_index);
+            println!("  Fetch URL:   https://rekor.sigstore.dev/api/v1/log/entries?logIndex={}", entry_index);
+        }
+    }
+}
+
+/// Format a DigestAlgorithm as a human-readable string
+fn format_digest_algorithm(alg: &DigestAlgorithm) -> &'static str {
+    match alg {
+        DigestAlgorithm::Unknown => "Unknown",
+        DigestAlgorithm::Sha256 => "SHA-256",
+        DigestAlgorithm::Sha384 => "SHA-384",
     }
 }
 
