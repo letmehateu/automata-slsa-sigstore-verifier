@@ -16,8 +16,27 @@ const OUTPUT_FIELDS: VerificationOutputField[] = [
     { id: 11, label: "Rekor Integrated Time", description: "When the entry was persisted.", technicalKey: "integrated_time" },
 ];
 
+const ZKVM_COMMANDS = {
+  RISC0: {
+    build: 'cargo build -p risc0-host --release',
+    prove: 'cargo run -p risc0-host --release -- prove \\\n  --bundle ./attestation.json \\\n  --trust-roots ./trusted-root.json \\\n --output ./output/boundless-proof.json \\\n  boundless',
+    imageId: 'cargo run -p risc0-host -- image-id',
+  },
+  SP1: {
+    build: 'cargo build -p sp1-host --release',
+    prove: 'cargo run -p sp1-host --release -- prove \\\n  --bundle ./attestation.json \\\n  --trust-roots ./trusted-root.json \\\n --output ./output/boundless-proof.json \\\n  network',
+    imageId: 'cargo run -p sp1-host -- verifying-key',
+  },
+  Pico: {
+    build: 'cargo build -p pico-host --release',
+    prove: 'cargo run -p pico-host --release -- prove \\\n  --bundle ./attestation.json \\\n  --trust-roots ./trusted-root.json',
+    imageId: 'cargo run -p pico-host -- program-id',
+  },
+};
+
 const ZkVerifierDetails: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'input' | 'process' | 'output'>('input');
+  const [selectedVm, setSelectedVm] = useState<'RISC0' | 'SP1' | 'Pico'>('RISC0');
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
@@ -52,33 +71,29 @@ const ZkVerifierDetails: React.FC = () => {
                 </p>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-slate-950 p-5 rounded-lg border border-slate-800 font-mono text-sm">
+                    <div className="bg-slate-950 p-5 rounded-lg border border-slate-800 font-mono text-sm overflow-hidden">
                         <div className="text-blue-400 font-bold mb-2">// 1. Attestation Bundle</div>
-                        <div className="text-slate-500">
-                            {`{
+                        <pre className="text-slate-500 overflow-x-auto whitespace-pre">{`{
   "mediaType": "application/vnd.dev.sigstore.bundle+json;version=0.3",
   "verificationMaterial": { ... },
   "dsseEnvelope": {
     "payload": "...",
     "signatures": [ ... ]
   }
-}`}
-                        </div>
+}`}</pre>
                         <p className="mt-4 text-xs text-slate-400 font-sans">
                             Generated directly by the <code className="bg-slate-800 px-1 py-0.5 rounded text-slate-200">attest-build-provenance</code> GitHub Action.
                         </p>
                     </div>
 
-                    <div className="bg-slate-950 p-5 rounded-lg border border-slate-800 font-mono text-sm">
+                    <div className="bg-slate-950 p-5 rounded-lg border border-slate-800 font-mono text-sm overflow-hidden">
                         <div className="text-purple-400 font-bold mb-2">// 2. Trust Roots</div>
-                        <div className="text-slate-500">
-                            {`{
+                        <pre className="text-slate-500 overflow-x-auto whitespace-pre">{`{
   "mediaType": "application/vnd.dev.sigstore.trustedroot+json;version=0.1",
   "certificateAuthorities": [ ... ],
   "tlogs": [ ... ],
   "timestampAuthorities": [ ... ]
-}`}
-                        </div>
+}`}</pre>
                         <p className="mt-4 text-xs text-slate-400 font-sans">
                             Obtained via CLI: <code className="bg-slate-800 px-1 py-0.5 rounded text-slate-200">gh attestation trusted-root</code>
                         </p>
@@ -92,12 +107,41 @@ const ZkVerifierDetails: React.FC = () => {
                 <div>
                     <h3 className="text-xl font-bold text-white mb-2">Supported Environments</h3>
                     <p className="text-slate-400 mb-6">Our Rust library is optimized for compilation to RISC-V and other zkVM targets. All produce Groth16 SNARK proofs for on-chain verification.</p>
-                    <div className="flex flex-wrap gap-4">
-                        {['RISC0', 'SP1', 'Pico'].map(vm => (
-                            <div key={vm} className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-semibold">
+                    <div className="flex flex-wrap gap-3 mb-6">
+                        {(['RISC0', 'SP1', 'Pico'] as const).map(vm => (
+                            <button
+                                key={vm}
+                                onClick={() => setSelectedVm(vm)}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-full border font-semibold transition-all ${
+                                    selectedVm === vm
+                                        ? 'bg-indigo-600 border-indigo-500 text-white'
+                                        : 'bg-slate-800 border-slate-700 text-slate-200 hover:border-slate-600'
+                                }`}
+                            >
                                 <Box size={16} /> {vm}
-                            </div>
+                            </button>
                         ))}
+                    </div>
+
+                    <div className="bg-slate-950 rounded-lg border border-slate-800 overflow-hidden">
+                        <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-2">
+                            <Terminal size={16} className="text-slate-400" />
+                            <span className="text-sm font-medium text-slate-300">{selectedVm} Commands</span>
+                        </div>
+                        <div className="p-4 space-y-4">
+                            <div>
+                                <div className="text-xs text-slate-500 mb-1">Build</div>
+                                <pre className="text-sm text-emerald-400 overflow-x-auto whitespace-pre">{ZKVM_COMMANDS[selectedVm].build}</pre>
+                            </div>
+                            <div>
+                                <div className="text-xs text-slate-500 mb-1">Get Program ID</div>
+                                <pre className="text-sm text-blue-400 overflow-x-auto whitespace-pre">{ZKVM_COMMANDS[selectedVm].imageId}</pre>
+                            </div>
+                            <div>
+                                <div className="text-xs text-slate-500 mb-1">Generate Proof</div>
+                                <pre className="text-sm text-purple-400 overflow-x-auto whitespace-pre">{ZKVM_COMMANDS[selectedVm].prove}</pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
