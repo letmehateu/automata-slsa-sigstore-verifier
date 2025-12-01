@@ -49,7 +49,7 @@ const ZkVerifierDetails: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('process')}
-          className={`px-6 py-4 flex items-center gap-2 font-medium transition-colors ${activeTab === 'process' ? 'text-purple-400 border-b-2 border-purple-400 bg-slate-900' : 'text-slate-400 hover:text-slate-200'}`}
+          className={`px-6 py-4 flex items-center gap-2 font-medium transition-colors ${activeTab === 'process' ? 'text-orange-400 border-b-2 border-orange-400 bg-slate-900' : 'text-slate-400 hover:text-slate-200'}`}
         >
           <Cpu size={18} /> zkVM Process
         </button>
@@ -87,7 +87,7 @@ const ZkVerifierDetails: React.FC = () => {
                     </div>
 
                     <div className="bg-slate-950 p-5 rounded-lg border border-slate-800 font-mono text-sm overflow-hidden">
-                        <div className="text-purple-400 font-bold mb-2">// 2. Trust Roots</div>
+                        <div className="text-orange-400 font-bold mb-2">// 2. Trust Roots</div>
                         <pre className="text-slate-500 overflow-x-auto whitespace-pre">{`{
   "mediaType": "application/vnd.dev.sigstore.trustedroot+json;version=0.1",
   "certificateAuthorities": [ ... ],
@@ -114,7 +114,7 @@ const ZkVerifierDetails: React.FC = () => {
                                 onClick={() => setSelectedVm(vm)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-full border font-semibold transition-all ${
                                     selectedVm === vm
-                                        ? 'bg-indigo-600 border-indigo-500 text-white'
+                                        ? 'bg-orange-600 border-orange-500 text-white'
                                         : 'bg-slate-800 border-slate-700 text-slate-200 hover:border-slate-600'
                                 }`}
                             >
@@ -139,7 +139,7 @@ const ZkVerifierDetails: React.FC = () => {
                             </div>
                             <div>
                                 <div className="text-xs text-slate-500 mb-1">Generate Proof</div>
-                                <pre className="text-sm text-purple-400 overflow-x-auto whitespace-pre">{ZKVM_COMMANDS[selectedVm].prove}</pre>
+                                <pre className="text-sm text-orange-400 overflow-x-auto whitespace-pre">{ZKVM_COMMANDS[selectedVm].prove}</pre>
                             </div>
                         </div>
                     </div>
@@ -156,7 +156,7 @@ const ZkVerifierDetails: React.FC = () => {
                         </p>
                     </div>
                     <div className="relative">
-                        <span className="absolute -left-[41px] bg-slate-900 border-2 border-purple-500 w-6 h-6 rounded-full flex items-center justify-center text-xs text-purple-400">2</span>
+                        <span className="absolute -left-[41px] bg-slate-900 border-2 border-orange-500 w-6 h-6 rounded-full flex items-center justify-center text-xs text-orange-400">2</span>
                         <h4 className="text-lg font-semibold text-white">Proof Generation</h4>
                         <p className="text-slate-400 text-sm">
                             A Groth16 ZK-SNARK proof is generated, cryptographically proving the verification succeeded.
@@ -201,7 +201,7 @@ const ZkVerifierDetails: React.FC = () => {
 
                     {/* Certificate Chain */}
                     <div className="mb-6">
-                        <h4 className="text-md font-semibold text-purple-300 mb-3 flex items-center gap-2">
+                        <h4 className="text-md font-semibold text-orange-300 mb-3 flex items-center gap-2">
                             <FileJson size={16} /> Certificate Chains
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -276,8 +276,8 @@ const ZkVerifierDetails: React.FC = () => {
                             </p>
                         </div>
 
-                        <div className="bg-gradient-to-br from-purple-900/20 to-purple-800/10 p-5 rounded-xl border border-purple-500/20">
-                            <h4 className="text-lg font-semibold text-purple-200 mb-2">Governance</h4>
+                        <div className="bg-gradient-to-br from-amber-900/20 to-amber-800/10 p-5 rounded-xl border border-amber-500/20">
+                            <h4 className="text-lg font-semibold text-amber-200 mb-2">Governance</h4>
                             <p className="text-sm text-slate-400">
                                 Time-lock contract execution based on build timestamps.
                                 Require artifacts built after security audit completion using the{' '}

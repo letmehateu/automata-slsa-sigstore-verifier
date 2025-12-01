@@ -18,15 +18,15 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-orange-500/30">
       
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-8 h-8 text-indigo-500" />
-              <span className="font-bold text-xl tracking-tight text-white">Sigstore<span className="text-indigo-400">ZK</span></span>
+              <ShieldCheck className="w-8 h-8 text-orange-500" />
+              <span className="font-bold text-xl tracking-tight text-white"><span className="text-orange-400">Automata</span> Sigstore <span className="text-orange-400">ZK</span></span>
             </div>
             <div className="hidden md:block">
               <div className="flex items-baseline space-x-4">
@@ -45,20 +45,20 @@ const App: React.FC = () => {
         {/* Hero Section */}
         <section id="overview" className="relative min-h-[70vh] flex items-center justify-center overflow-hidden scroll-mt-16">
             {/* Background Gradients */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[128px] pointer-events-none" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[128px] pointer-events-none" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-600/20 rounded-full blur-[128px] pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-600/10 rounded-full blur-[128px] pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-slate-700 text-sm text-indigo-300 mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-slate-700 text-sm text-orange-300 mb-8">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                     </span>
                     Running on RISC0, SP1 & Pico
                 </div>
                 <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6">
                     Trust your software.<br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Prove it on-chain.</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-400">Prove it on-chain.</span>
                 </h1>
                 <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-400">
                     The missing link between GitHub Actions and Smart Contracts. 
@@ -114,7 +114,7 @@ const App: React.FC = () => {
                     <p className="text-slate-400 max-w-3xl">
                         We built a portable Rust library that verifies Sigstore bundles within Zero-Knowledge Virtual Machines (RISC0, SP1, and Pico).
                         The verifier generates Groth16 SNARK proofs containing certificate hashes, OIDC identity, and timestamp data,
-                        enabling <span className="text-indigo-400 font-semibold">Proof of Provenance</span> on Ethereum and other blockchains.
+                        enabling <span className="text-orange-400 font-semibold">Proof of Provenance</span> on Ethereum and other blockchains.
                     </p>
                 </div>
                 

@@ -35,7 +35,7 @@ const SigstoreExplainer = () => {
       id: 'fulcio',
       title: 'Fulcio',
       icon: <FileBadge className="w-8 h-8" />,
-      color: 'bg-purple-600',
+      color: 'bg-orange-600',
       description: 'Certificate Authority',
       details: [
         { title: 'Identity Verification', text: 'Fulcio verifies the OIDC token to confirm the user owns the email or identity claimed.' },

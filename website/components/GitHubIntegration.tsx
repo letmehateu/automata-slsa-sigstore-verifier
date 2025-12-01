@@ -9,7 +9,7 @@ const GitHubIntegration: React.FC = () => {
       {/* How to Generate Attestations */}
       <div className="bg-slate-950/30 rounded-xl p-6 border border-slate-800">
         <h3 className="text-2xl font-bold text-white mb-3 flex items-center gap-2">
-          <Shield className="w-6 h-6 text-indigo-400" />
+          <Shield className="w-6 h-6 text-orange-400" />
           Step 1: Generate Attestations
         </h3>
         <p className="text-slate-400 mb-4">
@@ -114,14 +114,14 @@ gh attestation download <artifact-url> --format json > bundle.sigstore.json`}
         </div>
 
         {/* Private Repos */}
-        <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-6 hover:border-indigo-500/50 transition-colors">
+        <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-6 hover:border-orange-500/50 transition-colors">
             <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-indigo-500/10 rounded-lg text-indigo-400">
+                <div className="p-3 bg-orange-500/10 rounded-lg text-orange-400">
                     <Lock size={24} />
                 </div>
                 <div>
                     <h3 className="text-xl font-bold text-white">Private Repositories</h3>
-                    <p className="text-sm text-indigo-400">GitHub Internal CA</p>
+                    <p className="text-sm text-orange-400">GitHub Internal CA</p>
                 </div>
             </div>
             
@@ -155,7 +155,7 @@ gh attestation download <artifact-url> --format json > bundle.sigstore.json`}
       {/* How to Get Trust Roots */}
       <div className="bg-slate-950/30 rounded-xl p-6 border border-slate-800">
         <h3 className="text-2xl font-bold text-white mb-3 flex items-center gap-2">
-          <Key className="w-6 h-6 text-purple-400" />
+          <Key className="w-6 h-6 text-orange-400" />
           Step 3: Get Trust Roots
         </h3>
         <p className="text-slate-400 mb-4">
