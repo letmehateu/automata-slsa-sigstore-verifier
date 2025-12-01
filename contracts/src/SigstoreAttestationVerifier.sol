@@ -47,10 +47,7 @@ contract SigstoreAttestationVerifier is ISigstoreAttestationVerifier, Ownable {
         bytes calldata output,
         ZkCoProcessorType zkCoProcessor,
         bytes calldata proofBytes
-    )
-        external
-        returns (VerificationResult memory verifiedOutput)
-    {
+    ) external returns (VerificationResult memory verifiedOutput) {
         _noneZkConfigCheck(zkCoProcessor);
         ZkCoProcessorConfig memory config = _zkConfig[zkCoProcessor];
 

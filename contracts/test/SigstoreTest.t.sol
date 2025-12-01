@@ -10,7 +10,6 @@ import {ControlID} from "risc0/groth16/ControlID.sol";
 import {SP1Verifier} from "@sp1-contracts/v5.0.0/SP1VerifierGroth16.sol";
 
 contract SigstoreTest is Test {
-
     RiscZeroGroth16Verifier risc0Verifier;
     SP1Verifier sp1Verifier;
     SigstoreAttestationVerifier sigstoreVerifier;
@@ -28,77 +27,35 @@ contract SigstoreTest is Test {
         sp1Verifier = new SP1Verifier();
 
         sigstoreVerifier = new SigstoreAttestationVerifier(admin);
-        sigstoreVerifier.setZkCoProcessorConfig(
-            ZkCoProcessorType.RiscZero,
-            RISC0_IMAGE_ID,
-            address(risc0Verifier)
-        );
-        sigstoreVerifier.setZkCoProcessorConfig(
-            ZkCoProcessorType.Succinct,
-            SP1_VKEY,
-            address(sp1Verifier)
-        );
+        sigstoreVerifier.setZkCoProcessorConfig(ZkCoProcessorType.RiscZero, RISC0_IMAGE_ID, address(risc0Verifier));
+        sigstoreVerifier.setZkCoProcessorConfig(ZkCoProcessorType.Succinct, SP1_VKEY, address(sp1Verifier));
 
         vm.stopPrank();
     }
 
     function testRiscZeroProofVerification() public {
-        string memory path = string.concat(
-            vm.projectRoot(),
-            "/",
-            "test",
-            "/",
-            "fixtures",
-            "/",
-            "boundless-public.json"
-        );
+        string memory path = string.concat(vm.projectRoot(), "/", "test", "/", "fixtures", "/", "boundless-public.json");
 
         (bytes memory output, bytes memory proof) = _readFixture(path);
 
         vm.expectEmit(false, false, false, true);
         emit AttestationSubmitted(ZkCoProcessorType.RiscZero, output);
-        sigstoreVerifier.verifyAndAttestWithZKProof(
-            output,
-            ZkCoProcessorType.RiscZero,
-            proof
-        );
+        sigstoreVerifier.verifyAndAttestWithZKProof(output, ZkCoProcessorType.RiscZero, proof);
     }
 
     function testSp1ProofVerification() public {
-        string memory path = string.concat(
-            vm.projectRoot(),
-            "/",
-            "test",
-            "/",
-            "fixtures",
-            "/",
-            "sp1-github.json"
-        );
+        string memory path = string.concat(vm.projectRoot(), "/", "test", "/", "fixtures", "/", "sp1-github.json");
 
         (bytes memory output, bytes memory proof) = _readFixture(path);
 
         vm.expectEmit(false, false, false, true);
         emit AttestationSubmitted(ZkCoProcessorType.Succinct, output);
-        sigstoreVerifier.verifyAndAttestWithZKProof(
-            output,
-            ZkCoProcessorType.Succinct,
-            proof
-        );
+        sigstoreVerifier.verifyAndAttestWithZKProof(output, ZkCoProcessorType.Succinct, proof);
     }
 
-    function _readFixture(string memory path) private view returns (
-        bytes memory output,
-        bytes memory proof
-    ) {
+    function _readFixture(string memory path) private view returns (bytes memory output, bytes memory proof) {
         string memory json = vm.readFile(path);
-        output = abi.decode(
-            vm.parseJson(json, ".journal"),
-            (bytes)
-        );
-        proof = abi.decode(
-            vm.parseJson(json, ".proof"),
-            (bytes)
-        );
+        output = abi.decode(vm.parseJson(json, ".journal"), (bytes));
+        proof = abi.decode(vm.parseJson(json, ".proof"), (bytes));
     }
-
 }

@@ -1,4 +1,4 @@
-name: CI
+name: Foundry Build CI
 
 permissions:
   contents: read
@@ -15,6 +15,11 @@ jobs:
   check:
     name: Foundry project
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: contracts
+
     steps:
       - uses: actions/checkout@v5
         with:
