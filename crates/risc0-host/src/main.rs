@@ -70,7 +70,6 @@ async fn handle_prove(args: crate::cli::ProveArgs) -> Result<()> {
 
     let verification_options = VerificationOptions {
         expected_digest: None,
-        allow_insecure_sct: false,
         expected_issuer: None,
         expected_subject: None,
     };
@@ -118,12 +117,12 @@ async fn handle_prove(args: crate::cli::ProveArgs) -> Result<()> {
     
         let artifact = ProofArtifact {
             zkvm: "risc0".to_string(),
-            program_id: prover.program_identifier()?,
+            program_id: format!("0x{}", prover.program_identifier()?),
             circuit_version: crate::prover::Risc0Prover::circuit_version(),
             journal: format!("0x{}", hex::encode(&journal)),
             proof: format!("0x{}", hex::encode(&seal)),
         };
-
+        
         write_proof_artifact(output_path, &artifact)
             .context("Failed to write proof artifact")?;
     }

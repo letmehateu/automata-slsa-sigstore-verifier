@@ -54,8 +54,6 @@ let tsa_chain = Some(CertificateChain {
 
 let options = VerificationOptions {
     expected_digest: None,
-    verify_rekor: true,
-    allow_insecure_sct: false,
     expected_issuer: Some("https://token.actions.githubusercontent.com".to_string()),
     expected_subject: Some("repo:owner/repo:ref:refs/heads/main".to_string()),
 };
@@ -176,7 +174,7 @@ You can optionally validate the expected issuer and subject by setting `expected
 ## Limitations
 
 - **Certificate revocation checking**: Not implemented (no CRL or OCSP validation)
-- **SCT verification**: Reserved but not yet implemented (`allow_insecure_sct` flag exists but unused)
+- **SCT verification**: Not implemented (no Signed Certificate Timestamp validation)
 - **Rekor signed entry timestamp verification**: Entry existence is checked but signature validation is not fully implemented
 - **RSA DSSE signatures**: Only ECDSA (P-256, P-384) is supported for DSSE envelope signatures
 - **Single signature verification**: Only the first signature in the DSSE envelope is verified

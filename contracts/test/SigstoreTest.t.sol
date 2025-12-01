@@ -10,14 +10,13 @@ import {ControlID} from "risc0/groth16/ControlID.sol";
 import {SP1Verifier} from "@sp1-contracts/v5.0.0/SP1VerifierGroth16.sol";
 
 contract SigstoreTest is Test {
-
     RiscZeroGroth16Verifier risc0Verifier;
     SP1Verifier sp1Verifier;
     SigstoreAttestationVerifier sigstoreVerifier;
     address admin = address(1);
 
-    bytes32 constant RISC0_IMAGE_ID = 0x9635bbc29e531f8ad7f2cc3fa18dcc7f08b2f74de5a189f2d394e581dcf524f3;
-    bytes32 constant SP1_VKEY = 0x00204312c6f7cbbc6eaf391a6660787279ea049bb7078694d5c62a8c5aa44dc9;
+    bytes32 constant RISC0_IMAGE_ID = 0xddcec7db184cde2e6d8419f795308f6cf849626434be292e2adff357efaee0ef;
+    bytes32 constant SP1_VKEY = 0x0081d74e3b06e31064884f3441929c5279eaae8e1dcf9a51874af1262b6c11eb;
 
     event AttestationSubmitted(ZkCoProcessorType verifierType, bytes output);
 
@@ -28,77 +27,35 @@ contract SigstoreTest is Test {
         sp1Verifier = new SP1Verifier();
 
         sigstoreVerifier = new SigstoreAttestationVerifier(admin);
-        sigstoreVerifier.setZkCoProcessorConfig(
-            ZkCoProcessorType.RiscZero,
-            RISC0_IMAGE_ID,
-            address(risc0Verifier)
-        );
-        sigstoreVerifier.setZkCoProcessorConfig(
-            ZkCoProcessorType.Succinct,
-            SP1_VKEY,
-            address(sp1Verifier)
-        );
+        sigstoreVerifier.setZkCoProcessorConfig(ZkCoProcessorType.RiscZero, RISC0_IMAGE_ID, address(risc0Verifier));
+        sigstoreVerifier.setZkCoProcessorConfig(ZkCoProcessorType.Succinct, SP1_VKEY, address(sp1Verifier));
 
         vm.stopPrank();
     }
 
     function testRiscZeroProofVerification() public {
-        string memory path = string.concat(
-            vm.projectRoot(),
-            "/",
-            "test",
-            "/",
-            "fixtures",
-            "/",
-            "boundless-public.json"
-        );
+        string memory path = string.concat(vm.projectRoot(), "/", "test", "/", "fixtures", "/", "boundless-public.json");
 
         (bytes memory output, bytes memory proof) = _readFixture(path);
 
         vm.expectEmit(false, false, false, true);
         emit AttestationSubmitted(ZkCoProcessorType.RiscZero, output);
-        sigstoreVerifier.verifyAndAttestWithZKProof(
-            output,
-            ZkCoProcessorType.RiscZero,
-            proof
-        );
+        sigstoreVerifier.verifyAndAttestWithZKProof(output, ZkCoProcessorType.RiscZero, proof);
     }
 
     function testSp1ProofVerification() public {
-        string memory path = string.concat(
-            vm.projectRoot(),
-            "/",
-            "test",
-            "/",
-            "fixtures",
-            "/",
-            "sp1-github.json"
-        );
+        string memory path = string.concat(vm.projectRoot(), "/", "test", "/", "fixtures", "/", "sp1-github.json");
 
         (bytes memory output, bytes memory proof) = _readFixture(path);
 
         vm.expectEmit(false, false, false, true);
         emit AttestationSubmitted(ZkCoProcessorType.Succinct, output);
-        sigstoreVerifier.verifyAndAttestWithZKProof(
-            output,
-            ZkCoProcessorType.Succinct,
-            proof
-        );
+        sigstoreVerifier.verifyAndAttestWithZKProof(output, ZkCoProcessorType.Succinct, proof);
     }
 
-    function _readFixture(string memory path) private view returns (
-        bytes memory output,
-        bytes memory proof
-    ) {
+    function _readFixture(string memory path) private view returns (bytes memory output, bytes memory proof) {
         string memory json = vm.readFile(path);
-        output = abi.decode(
-            vm.parseJson(json, ".journal"),
-            (bytes)
-        );
-        proof = abi.decode(
-            vm.parseJson(json, ".proof"),
-            (bytes)
-        );
+        output = abi.decode(vm.parseJson(json, ".journal"), (bytes));
+        proof = abi.decode(vm.parseJson(json, ".proof"), (bytes));
     }
-
 }

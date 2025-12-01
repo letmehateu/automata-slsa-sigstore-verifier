@@ -25,7 +25,6 @@ fn test_verify_rekor_bundle() {
     let verifier = AttestationVerifier::new();
     let options = VerificationOptions {
         expected_digest: None,
-        allow_insecure_sct: false, // Not yet implemented
         expected_issuer: None,
         expected_subject: None,
     };
@@ -85,7 +84,6 @@ fn test_verify_rfc3161_bundle() {
     let verifier = AttestationVerifier::new();
     let options = VerificationOptions {
         expected_digest: None,
-        allow_insecure_sct: false, // Not yet implemented
         expected_issuer: None,
         expected_subject: None,
     };

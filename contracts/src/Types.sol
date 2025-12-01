@@ -44,7 +44,7 @@ enum TimestampProofType {
 struct VerificationResult {
     uint64 timestamp;
     TimestampProofType timestampProofType;
-    bytes32[] certificateHashes;        // [leaf, ...intermediates, root]
+    bytes32[] certificateHashes; // [leaf, ...intermediates, root]
     bytes subjectDigest;
     DigestAlgorithm subjectDigestAlgorithm;
     string oidcIssuer;
@@ -53,21 +53,17 @@ struct VerificationResult {
     string oidcRepository;
     string oidcEventName;
     // RFC 3161 timestamp proof fields (populated when timestampProofType == Rfc3161)
-    bytes32[] tsaChainHashes;           // TSA certificate chain hashes
+    bytes32[] tsaChainHashes; // TSA certificate chain hashes
     DigestAlgorithm messageImprintAlgorithm;
-    bytes messageImprint;               // Hash of DSSE signature
+    bytes messageImprint; // Hash of DSSE signature
     // Rekor timestamp proof fields (populated when timestampProofType == Rekor)
-    bytes32 rekorLogId;                 // SHA256 of Rekor's public key
-    uint64 rekorLogIndex;               // Tree leaf index (for Merkle proof verification)
-    uint64 rekorEntryIndex;             // Entry index (for API queries)
+    bytes32 rekorLogId; // SHA256 of Rekor's public key
+    uint64 rekorLogIndex; // Tree leaf index (for Merkle proof verification)
+    uint64 rekorEntryIndex; // Entry index (for API queries)
 }
 
 library VerificationResultParser {
-    function parseVerificationResultBytes(bytes memory data)
-        internal
-        pure
-        returns (VerificationResult memory result)
-    {
+    function parseVerificationResultBytes(bytes memory data) internal pure returns (VerificationResult memory result) {
         // Validate minimum data length (8 bytes timestamp + 1 byte proof type + 32 byte tuple offset + ABI data)
         if (data.length < 73) revert InvalidDataLength();
 
@@ -118,7 +114,7 @@ library VerificationResultParser {
         }
     }
 
-    function _decodeAbiData(bytes memory abiData, VerificationResult memory result) private pure {        
+    function _decodeAbiData(bytes memory abiData, VerificationResult memory result) private pure {
         // Decode all fields
         (
             bytes32[] memory certHashes,
@@ -137,7 +133,22 @@ library VerificationResultParser {
             uint64 rekorEntryIndex
         ) = abi.decode(
             abiData,
-            (bytes32[], bytes, uint8, string, string, string, string, string, bytes32[], uint8, bytes, bytes32, uint64, uint64)
+            (
+                bytes32[],
+                bytes,
+                uint8,
+                string,
+                string,
+                string,
+                string,
+                string,
+                bytes32[],
+                uint8,
+                bytes,
+                bytes32,
+                uint64,
+                uint64
+            )
         );
 
         // Assign to result struct

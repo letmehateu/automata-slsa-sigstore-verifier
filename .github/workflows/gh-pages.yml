@@ -1,0 +1,46 @@
+name: Deploy to GitHub Pages
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'website/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Website
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: website
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build website
+        run: npm run build
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/dist
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: 'Deploy website - ${{ github.sha }}'

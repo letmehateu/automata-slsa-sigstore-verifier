@@ -71,7 +71,6 @@ async fn handle_prove(args: crate::cli::ProveArgs) -> Result<()> {
 
     let verification_options = VerificationOptions {
         expected_digest: None,
-        allow_insecure_sct: false,
         expected_issuer: None,
         expected_subject: None,
     };

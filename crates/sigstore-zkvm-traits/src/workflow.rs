@@ -53,7 +53,6 @@ use std::path::Path;
 /// let trusted_root_path = Path::new("samples/trusted_root.jsonl");
 /// let options = VerificationOptions {
 ///     expected_digest: None,
-///     allow_insecure_sct: false,
 ///     expected_issuer: None,
 ///     expected_subject: None,
 /// };

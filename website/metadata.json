@@ -1,0 +1,5 @@
+{
+  "name": "Sigstore zkVM Explainer",
+  "description": "An educational platform explaining the Sigstore protocol and a custom Rust-based zkVM verifier implementation for secure software supply chains.",
+  "requestFramePermissions": []
+}
