@@ -3,6 +3,7 @@ import { SectionId } from './types';
 import OverviewDiagram from './components/OverviewDiagram';
 import GitHubIntegration from './components/GitHubIntegration';
 import ZkVerifierDetails from './components/ZkVerifierDetails';
+import CodeIntegration from './components/CodeIntegration';
 import ChatInterface from './components/ChatInterface';
 import { ShieldCheck, ChevronDown, Github, Terminal } from 'lucide-react';
 
@@ -26,13 +27,14 @@ const App: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-8 h-8 text-orange-500" />
-              <span className="font-bold text-xl tracking-tight text-white"><span className="text-orange-400">Automata</span> Sigstore <span className="text-orange-400">ZK</span></span>
+              <span className="font-bold text-xl tracking-tight text-white"><span className="text-orange-400">Automata</span> Sigstore Attest</span>
             </div>
             <div className="hidden md:block">
               <div className="flex items-baseline space-x-4">
                 <a href="#overview" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Overview</a>
                 <a href="#bundles" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Get Started</a>
                 <a href="#verifier" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">ZK Verification</a>
+                <a href="#integration" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Integration</a>
                 {/* <a href="#faq" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Ask AI</a> */}
               </div>
             </div>
@@ -87,7 +89,7 @@ const App: React.FC = () => {
             </div>
         </section>
 
-        {/* GitHub Bundles */}
+        {/* Getting Started */}
         <section id="bundles" className="py-20 bg-slate-900 border-y border-slate-800 scroll-mt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
@@ -104,7 +106,7 @@ const App: React.FC = () => {
             </div>
         </section>
 
-        {/* Our Implementation */}
+        {/* ZK Verification */}
         <section id="verifier" className="py-24 bg-slate-950 relative scroll-mt-16">
              <div className="absolute top-0 right-0 w-1/3 h-full bg-blue-900/5 pointer-events-none" />
              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -119,6 +121,13 @@ const App: React.FC = () => {
                 
                 <ZkVerifierDetails />
              </div>
+        </section>
+
+        {/* Code Integration */}
+        <section id="integration" className="py-20 bg-slate-900 border-y border-slate-800 scroll-mt-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <CodeIntegration />
+            </div>
         </section>
 
         {/* AI FAQ */}

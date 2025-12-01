@@ -106,7 +106,7 @@ const ZkVerifierDetails: React.FC = () => {
             <div className="animate-fade-in space-y-8">
                 <div>
                     <h3 className="text-xl font-bold text-white mb-2">Supported Environments</h3>
-                    <p className="text-slate-400 mb-6">Our Rust library is optimized for compilation to RISC-V and other zkVM targets. All produce Groth16 SNARK proofs for on-chain verification.</p>
+                    <p className="text-slate-400 mb-6">Our Rust Verifier Library compiles to RISC-V to support zkVMs. All produce Groth16 SNARK proofs for on-chain verification.</p>
                     <div className="flex flex-wrap gap-3 mb-6">
                         {(['RISC0', 'SP1', 'Pico'] as const).map(vm => (
                             <button
