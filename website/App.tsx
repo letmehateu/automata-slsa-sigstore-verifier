@@ -5,10 +5,11 @@ import GitHubIntegration from './components/GitHubIntegration';
 import ZkVerifierDetails from './components/ZkVerifierDetails';
 import CodeIntegration from './components/CodeIntegration';
 import ChatInterface from './components/ChatInterface';
-import { ShieldCheck, ChevronDown, Github, Terminal } from 'lucide-react';
+import { ShieldCheck, ChevronDown, Github, Terminal, Menu, X } from 'lucide-react';
 
 const App: React.FC = () => {
   const [activeSection, setActiveSection] = useState<SectionId>(SectionId.HERO);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Add smooth scrolling behavior
   React.useEffect(() => {
@@ -29,17 +30,63 @@ const App: React.FC = () => {
               <ShieldCheck className="w-8 h-8 text-orange-500" />
               <span className="font-bold text-xl tracking-tight text-white"><span className="text-orange-400">Automata</span> Sigstore Attest</span>
             </div>
+
+            {/* Desktop navigation */}
             <div className="hidden md:block">
               <div className="flex items-baseline space-x-4">
                 <a href="#overview" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Overview</a>
                 <a href="#bundles" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Get Started</a>
                 <a href="#verifier" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">ZK Verification</a>
                 <a href="#integration" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Integration</a>
-                {/* <a href="#faq" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Ask AI</a> */}
               </div>
             </div>
+
+            {/* Mobile hamburger button */}
+            <button
+              className="md:hidden p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-slate-950 border-b border-slate-800">
+            <div className="px-4 py-4 space-y-2">
+              <a
+                href="#overview"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white transition-colors font-medium"
+              >
+                Overview
+              </a>
+              <a
+                href="#bundles"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white transition-colors font-medium"
+              >
+                Get Started
+              </a>
+              <a
+                href="#verifier"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white transition-colors font-medium"
+              >
+                ZK Verification
+              </a>
+              <a
+                href="#integration"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white transition-colors font-medium"
+              >
+                Integration
+              </a>
+            </div>
+          </div>
+        )}
       </nav>
 
       <main className="pt-16">
@@ -58,7 +105,7 @@ const App: React.FC = () => {
                     </span>
                     Running on RISC0, SP1 & Pico
                 </div>
-                <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6">
+                <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white tracking-tight mb-6">
                     Trust your software.<br/>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-400">Prove it on-chain.</span>
                 </h1>
@@ -66,11 +113,11 @@ const App: React.FC = () => {
                     The missing link between GitHub Actions and Smart Contracts. 
                     We verify Sigstore attestations inside zkVMs to bring software supply chain security to the blockchain.
                 </p>
-                <div className="mt-10 flex justify-center gap-4">
-                    <a href="#protocol" className="px-8 py-3 rounded-lg bg-white text-slate-900 font-semibold hover:bg-slate-200 transition-colors">
+                <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4 px-4 sm:px-0">
+                    <a href="#protocol" className="w-full sm:w-auto text-center px-8 py-3 rounded-lg bg-white text-slate-900 font-semibold hover:bg-slate-200 transition-colors">
                         Learn the Protocol
                     </a>
-                    <a href="#verifier" className="px-8 py-3 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-700 transition-colors border border-slate-700 flex items-center gap-2">
+                    <a href="#verifier" className="w-full sm:w-auto text-center px-8 py-3 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-700 transition-colors border border-slate-700 flex items-center justify-center gap-2">
                         <Terminal size={18} />
                         View Verifier
                     </a>

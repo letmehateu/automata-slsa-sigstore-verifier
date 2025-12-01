@@ -40,7 +40,22 @@ const ZkVerifierDetails: React.FC = () => {
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
-      <div className="flex border-b border-slate-800 bg-slate-950">
+      {/* Mobile: Dropdown select */}
+      <div className="md:hidden p-4 border-b border-slate-800 bg-slate-950">
+        <select
+          value={activeTab}
+          onChange={(e) => setActiveTab(e.target.value as 'input' | 'process' | 'output')}
+          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none cursor-pointer"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}
+        >
+          <option value="input">Inputs</option>
+          <option value="process">zkVM Process</option>
+          <option value="output">Outputs</option>
+        </select>
+      </div>
+
+      {/* Desktop: Tab buttons */}
+      <div className="hidden md:flex border-b border-slate-800 bg-slate-950">
         <button
           onClick={() => setActiveTab('input')}
           className={`px-6 py-4 flex items-center gap-2 font-medium transition-colors ${activeTab === 'input' ? 'text-blue-400 border-b-2 border-blue-400 bg-slate-900' : 'text-slate-400 hover:text-slate-200'}`}

@@ -139,124 +139,73 @@ const SigstoreExplainer = () => {
             <span className="text-sm text-slate-500 hidden md:block">Click any step below for details</span>
           </div>
 
-          {/* Desktop/Tablet Flow */}
-          <div className="relative">
-            {/* Connecting Line (Absolute) */}
-            <div className="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-slate-800 -translate-y-1/2 z-0"></div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex flex-col items-center relative group">
-                  
-                  {/* Arrow Indicator for Flow (Mobile hidden) */}
-                  {index < steps.length - 1 && (
-                    <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 z-0 text-slate-600">
-                      <ArrowRight className="w-6 h-6" />
-                    </div>
-                  )}
-
-                  {/* The Card */}
+          {/* Interactive Flow - Mobile: stacked with inline expansion, Desktop: horizontal grid */}
+          <div className="space-y-4">
+            {steps.map((step, index) => (
+              <div key={step.id} className="relative">
+                {/* Card Container */}
+                <div className="md:hidden">
+                  {/* Mobile Layout: Stacked cards with inline expansion */}
                   <button
                     onClick={() => setActiveStep(activeStep === step.id ? null : step.id)}
                     className={`
-                      w-full relative p-6 rounded-xl border-2 transition-all duration-300 flex flex-col items-center text-center space-y-3
-                      shadow-lg cursor-pointer outline-none focus:ring-4 focus:ring-opacity-50
-                      ${activeStep === step.id 
-                        ? `border-${step.color.replace('bg-', '')} bg-slate-800 scale-105 shadow-2xl` 
-                        : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'
+                      w-full relative p-5 rounded-xl border-2 transition-all duration-300 flex items-center gap-4 text-left
+                      shadow-lg cursor-pointer outline-none focus:ring-2 focus:ring-opacity-50
+                      ${activeStep === step.id
+                        ? 'border-orange-500 bg-slate-800 shadow-xl'
+                        : 'border-slate-700 bg-slate-800/80 hover:border-slate-500'
                       }
                     `}
                   >
                     {/* Step Number Badge */}
-                    <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-slate-900 border border-slate-600 flex items-center justify-center font-bold text-sm text-slate-400">
+                    <div className="absolute -top-2 -left-2 w-7 h-7 rounded-full bg-slate-900 border border-slate-600 flex items-center justify-center font-bold text-xs text-slate-400">
                       {index + 1}
                     </div>
 
-                    <div className={`p-4 rounded-full ${step.color} text-white shadow-inner`}>
-                      {step.icon}
+                    <div className={`p-3 rounded-full ${step.color} text-white shadow-inner shrink-0`}>
+                      {React.cloneElement(step.icon, { className: 'w-6 h-6' })}
                     </div>
-                    <div>
-                      <h4 className="font-bold text-lg text-slate-100">{step.title}</h4>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-base text-slate-100">{step.title}</h4>
                       <p className="text-sm text-slate-400">{step.description}</p>
                     </div>
-
-                    {/* Active Indicator Triangle */}
-                    {activeStep === step.id && (
-                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-slate-800 hidden md:block" />
-                    )}
-                  </button>
-                  
-                  {/* Mobile Down Arrow */}
-                  {index < steps.length - 1 && (
-                    <div className="md:hidden py-2 text-slate-600">
-                      <ArrowRight className="w-6 h-6 rotate-90" />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* --- Section 4: Expandable Details Panel --- */}
-          <div className={`
-             transition-all duration-500 ease-in-out overflow-hidden
-             ${activeStep ? 'opacity-100 max-h-[800px] mt-8' : 'opacity-0 max-h-0 mt-0'}
-          `}>
-            {activeStep && (() => {
-              const currentStep = steps.find(s => s.id === activeStep);
-              return (
-                <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl relative animate-in fade-in slide-in-from-top-4 duration-300">
-                  <button 
-                    onClick={() => setActiveStep(null)}
-                    className="absolute top-4 right-4 p-2 hover:bg-slate-700 rounded-full transition-colors text-slate-400 hover:text-white"
-                  >
-                    <X className="w-5 h-5" />
+                    <ArrowRight className={`w-5 h-5 text-slate-500 transition-transform duration-300 shrink-0 ${activeStep === step.id ? 'rotate-90' : ''}`} />
                   </button>
 
-                  <div className="flex flex-col md:flex-row gap-8">
-                    {/* Left Column: Icon & Title */}
-                    <div className="md:w-1/3 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-slate-700 pb-6 md:pb-0 md:pr-6">
-                      <div className={`p-6 rounded-2xl ${currentStep.color} bg-opacity-20 mb-4`}>
-                        {React.cloneElement(currentStep.icon, { className: `w-16 h-16 ${currentStep.color.replace('bg-', 'text-')}` })}
-                      </div>
-                      <h3 className="text-3xl font-bold text-white mb-2">{currentStep.title}</h3>
-                      <p className="text-slate-400 font-medium">{currentStep.description}</p>
-                    </div>
-
-                    {/* Right Column: Details */}
-                    <div className="md:w-2/3 space-y-6">
-                      <h4 className="text-lg font-semibold text-slate-300 uppercase tracking-wider border-b border-slate-700 pb-2">
-                        Process Details
-                      </h4>
-
-                      {/* Conditional Render: Split Branches (for Rekor/TSA) vs Standard List */}
-                      {currentStep.branches ? (
-                         <div className="grid md:grid-cols-2 gap-4">
-                           {currentStep.branches.map((branch, i) => (
-                             <div key={i} className="bg-slate-900/50 p-4 rounded-xl border border-slate-700">
-                               <div className="flex items-center gap-2 mb-3 text-amber-400 font-bold">
-                                 {branch.subIcon}
-                                 <span>{branch.label}</span>
-                               </div>
-                               <ul className="space-y-3">
-                                 {branch.items.map((item, j) => (
-                                   <li key={j} className="text-sm">
-                                      <span className="font-semibold text-slate-200 block">{item.title}</span>
-                                      <span className="text-slate-400 text-xs leading-relaxed">{item.text}</span>
-                                   </li>
-                                 ))}
-                               </ul>
-                             </div>
-                           ))}
-                         </div>
+                  {/* Inline Expanded Content (Mobile) */}
+                  <div className={`
+                    overflow-hidden transition-all duration-300 ease-in-out
+                    ${activeStep === step.id ? 'max-h-[600px] opacity-100 mt-3' : 'max-h-0 opacity-0'}
+                  `}>
+                    <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+                      {/* Render details or branches */}
+                      {step.branches ? (
+                        <div className="space-y-3">
+                          {step.branches.map((branch, i) => (
+                            <div key={i} className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                              <div className="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
+                                {branch.subIcon}
+                                <span>{branch.label}</span>
+                              </div>
+                              <ul className="space-y-2">
+                                {branch.items.map((item, j) => (
+                                  <li key={j} className="text-sm">
+                                    <span className="font-semibold text-slate-200">{item.title}</span>
+                                    <span className="text-slate-400 text-xs block mt-0.5">{item.text}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
                       ) : (
-                        <ul className="space-y-4">
-                          {currentStep.details.map((detail, idx) => (
+                        <ul className="space-y-3">
+                          {step.details.map((detail, idx) => (
                             <li key={idx} className="flex items-start gap-3">
-                              <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0 mt-0.5" />
+                              <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
                               <div>
-                                <span className="font-bold text-white block mb-1">{detail.title}</span>
-                                <span className="text-slate-400 leading-relaxed">{detail.text}</span>
+                                <span className="font-semibold text-white text-sm">{detail.title}</span>
+                                <span className="text-slate-400 text-xs block mt-0.5">{detail.text}</span>
                               </div>
                             </li>
                           ))}
@@ -264,17 +213,146 @@ const SigstoreExplainer = () => {
                       )}
                     </div>
                   </div>
+
+                  {/* Mobile Down Arrow Between Cards */}
+                  {index < steps.length - 1 && (
+                    <div className="flex justify-center py-2 text-slate-600">
+                      <ArrowRight className="w-5 h-5 rotate-90" />
+                    </div>
+                  )}
                 </div>
-              );
-            })()}
-          </div>
-          
-          {/* Helper text if nothing selected */}
-          {!activeStep && (
-            <div className="text-center text-slate-600 italic py-8 animate-pulse">
-              Select a stage above to verify the protocol steps...
+              </div>
+            ))}
+
+            {/* Desktop Layout: Horizontal Grid with Connecting Line */}
+            <div className="hidden md:block relative">
+              {/* Connecting Line */}
+              <div className="absolute top-[72px] left-0 w-full h-1 bg-slate-800 z-0"></div>
+
+              <div className="grid grid-cols-4 gap-6 relative z-10">
+                {steps.map((step, index) => (
+                  <div key={step.id} className="flex flex-col items-center relative group">
+                    {/* Arrow Indicator for Flow */}
+                    {index < steps.length - 1 && (
+                      <div className="absolute -right-3 top-[72px] -translate-y-1/2 z-0 text-slate-600">
+                        <ArrowRight className="w-6 h-6" />
+                      </div>
+                    )}
+
+                    {/* The Card */}
+                    <button
+                      onClick={() => setActiveStep(activeStep === step.id ? null : step.id)}
+                      className={`
+                        w-full relative p-6 rounded-xl border-2 transition-all duration-300 flex flex-col items-center text-center space-y-3
+                        shadow-lg cursor-pointer outline-none focus:ring-4 focus:ring-opacity-50
+                        ${activeStep === step.id
+                          ? 'border-orange-500 bg-slate-800 scale-105 shadow-2xl'
+                          : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 hover:bg-slate-800'
+                        }
+                      `}
+                    >
+                      {/* Step Number Badge */}
+                      <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-slate-900 border border-slate-600 flex items-center justify-center font-bold text-sm text-slate-400">
+                        {index + 1}
+                      </div>
+
+                      <div className={`p-4 rounded-full ${step.color} text-white shadow-inner`}>
+                        {step.icon}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-lg text-slate-100">{step.title}</h4>
+                        <p className="text-sm text-slate-400">{step.description}</p>
+                      </div>
+
+                      {/* Active Indicator Triangle */}
+                      {activeStep === step.id && (
+                        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-slate-800" />
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Expanded Details Panel (below grid) */}
+              <div className={`
+                transition-all duration-500 ease-in-out overflow-hidden
+                ${activeStep ? 'opacity-100 max-h-[800px] mt-8' : 'opacity-0 max-h-0 mt-0'}
+              `}>
+                {activeStep && (() => {
+                  const currentStep = steps.find(s => s.id === activeStep);
+                  return (
+                    <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl relative">
+                      <button
+                        onClick={() => setActiveStep(null)}
+                        className="absolute top-4 right-4 p-2 hover:bg-slate-700 rounded-full transition-colors text-slate-400 hover:text-white"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+
+                      <div className="flex flex-row gap-8">
+                        {/* Left Column: Icon & Title */}
+                        <div className="w-1/3 flex flex-col items-center justify-center text-center border-r border-slate-700 pr-6">
+                          <div className={`p-6 rounded-2xl ${currentStep.color} bg-opacity-20 mb-4`}>
+                            {React.cloneElement(currentStep.icon, { className: `w-16 h-16 ${currentStep.color.replace('bg-', 'text-')}` })}
+                          </div>
+                          <h3 className="text-3xl font-bold text-white mb-2">{currentStep.title}</h3>
+                          <p className="text-slate-400 font-medium">{currentStep.description}</p>
+                        </div>
+
+                        {/* Right Column: Details */}
+                        <div className="w-2/3 space-y-6">
+                          <h4 className="text-lg font-semibold text-slate-300 uppercase tracking-wider border-b border-slate-700 pb-2">
+                            Process Details
+                          </h4>
+
+                          {/* Conditional Render: Split Branches (for Rekor/TSA) vs Standard List */}
+                          {currentStep.branches ? (
+                            <div className="grid grid-cols-2 gap-4">
+                              {currentStep.branches.map((branch, i) => (
+                                <div key={i} className="bg-slate-900/50 p-4 rounded-xl border border-slate-700">
+                                  <div className="flex items-center gap-2 mb-3 text-amber-400 font-bold">
+                                    {branch.subIcon}
+                                    <span>{branch.label}</span>
+                                  </div>
+                                  <ul className="space-y-3">
+                                    {branch.items.map((item, j) => (
+                                      <li key={j} className="text-sm">
+                                        <span className="font-semibold text-slate-200 block">{item.title}</span>
+                                        <span className="text-slate-400 text-xs leading-relaxed">{item.text}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <ul className="space-y-4">
+                              {currentStep.details.map((detail, idx) => (
+                                <li key={idx} className="flex items-start gap-3">
+                                  <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0 mt-0.5" />
+                                  <div>
+                                    <span className="font-bold text-white block mb-1">{detail.title}</span>
+                                    <span className="text-slate-400 leading-relaxed">{detail.text}</span>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Helper text if nothing selected (Desktop only) */}
+              {!activeStep && (
+                <div className="text-center text-slate-600 italic py-8 animate-pulse">
+                  Click any step above to learn more about the protocol...
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
       </div>
