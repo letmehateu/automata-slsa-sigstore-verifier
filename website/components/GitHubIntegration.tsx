@@ -179,7 +179,7 @@ jobs:
             title="Fetch all trust roots using GitHub CLI (recommended)"
             code={`gh attestation trusted-root > trusted_root.jsonl`}
           />
-          <CodeExample
+          {/* <CodeExample
             language="bash"
             title="Fetch GitHub Fulcio trust bundle directly"
             code={`curl https://fulcio.githubapp.com/api/v2/trustBundle > github_trust.json`}
@@ -188,7 +188,7 @@ jobs:
             language="bash"
             title="Fetch public Sigstore trust bundle"
             code={`curl https://fulcio.sigstore.dev/api/v2/trustBundle > sigstore_trust.json`}
-          />
+          /> */}
         </div>
       </div>
     </div>

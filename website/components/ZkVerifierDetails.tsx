@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Cpu, Terminal, ChevronRight, FileJson, CheckCircle2, Box } from 'lucide-react';
+import { Cpu, Terminal, FileJson, CheckCircle2, Box } from 'lucide-react';
 import { VerificationOutputField } from '../types';
 
 const OUTPUT_FIELDS: VerificationOutputField[] = [
-    { id: 1, label: "Fulcio Certificates Hash Chain", description: "Array of hashes, leaf first, root last.", technicalKey: "fulcio_certs" },
+    { id: 1, label: "Fulcio Certificates Hash Chain", description: "Array of SHA256 certificate hashes, leaf first, root last.", technicalKey: "fulcio_certs" },
     { id: 2, label: "Subject Digest", description: "The hash of the build artifact.", technicalKey: "subject_digest" },
     { id: 3, label: "OIDC Issuer", description: "The identity provider URL (e.g., https://token.actions.githubusercontent.com).", technicalKey: "oidc_issuer" },
     { id: 4, label: "OIDC Workflow Ref", description: "Reference to the workflow file.", technicalKey: "workflow_ref" },
     { id: 5, label: "OIDC Repository", description: "The repo where the action ran.", technicalKey: "repository" },
     { id: 6, label: "OIDC Event Name", description: "Trigger event (e.g., 'push', 'release').", technicalKey: "event_name" },
-    { id: 7, label: "TSA Certificate Hash Chain", description: "RFC 3161 only. Sorted leaf first.", technicalKey: "tsa_certs" },
+    { id: 7, label: "TSA Certificate Hash Chain", description: "RFC 3161 only. Array of SHA256 certificate hashes, leaf first, root last..", technicalKey: "tsa_certs" },
     { id: 8, label: "Message Imprint", description: "RFC 3161 only. Hash of DSSE Payload.", technicalKey: "message_imprint" },
     { id: 9, label: "Rekor Log ID", description: "Unique ID of the transparency log.", technicalKey: "log_id" },
     { id: 10, label: "Rekor Entry Index", description: "Position in the log.", technicalKey: "log_index" },
-    { id: 11, label: "Rekor Integrated Time", description: "When the entry was persisted.", technicalKey: "integrated_time" },
+    { id: 11, label: "Rekor Integrated Time", description: "The exact timestamp when the entry is included in the Rekor Log Merkle Tree", technicalKey: "integrated_time" },
 ];
 
 const ZKVM_COMMANDS = {
@@ -204,36 +204,33 @@ const ZkVerifierDetails: React.FC = () => {
                             <CheckCircle2 size={16} /> Artifact Information
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="bg-slate-950/50 p-3 rounded-lg border border-slate-800 hover:border-slate-600 transition-colors group">
-                                <div className="flex justify-between items-start mb-1">
-                                    <h5 className="font-semibold text-slate-200 text-sm">Subject Digest</h5>
-                                    <code className="text-[10px] text-slate-500 bg-slate-900 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">subjectDigest</code>
+                            {OUTPUT_FIELDS.filter(f => f.id === 2).map((field) => (
+                                <div key={field.id} className="bg-slate-950/50 p-3 rounded-lg border border-slate-800 hover:border-slate-600 transition-colors group">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <h5 className="font-semibold text-slate-200 text-sm">{field.label}</h5>
+                                        <code className="text-[10px] text-slate-500 bg-slate-900 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">{field.technicalKey}</code>
+                                    </div>
+                                    <p className="text-xs text-slate-400">{field.description}</p>
                                 </div>
-                                <p className="text-xs text-slate-400">Hash of the build artifact (SHA-256 or SHA-384)</p>
-                            </div>
+                            ))}
                         </div>
                     </div>
 
                     {/* Certificate Chain */}
                     <div className="mb-6">
                         <h4 className="text-md font-semibold text-orange-300 mb-3 flex items-center gap-2">
-                            <FileJson size={16} /> Certificate Chains
+                            <FileJson size={16} /> Certificate Chain
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="bg-slate-950/50 p-3 rounded-lg border border-slate-800 hover:border-slate-600 transition-colors group">
-                                <div className="flex justify-between items-start mb-1">
-                                    <h5 className="font-semibold text-slate-200 text-sm">Fulcio Certificate Hashes</h5>
-                                    <code className="text-[10px] text-slate-500 bg-slate-900 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">certificateHashes</code>
+                            {OUTPUT_FIELDS.filter(f => f.id === 1).map((field) => (
+                                <div key={field.id} className="bg-slate-950/50 p-3 rounded-lg border border-slate-800 hover:border-slate-600 transition-colors group">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <h5 className="font-semibold text-slate-200 text-sm">{field.label}</h5>
+                                        <code className="text-[10px] text-slate-500 bg-slate-900 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">{field.technicalKey}</code>
+                                    </div>
+                                    <p className="text-xs text-slate-400">{field.description}</p>
                                 </div>
-                                <p className="text-xs text-slate-400">SHA-256 hashes of the signing certificate chain [leaf, ...intermediates, root]</p>
-                            </div>
-                            <div className="bg-slate-950/50 p-3 rounded-lg border border-slate-800 hover:border-slate-600 transition-colors group">
-                                <div className="flex justify-between items-start mb-1">
-                                    <h5 className="font-semibold text-slate-200 text-sm">TSA Certificate Hashes</h5>
-                                    <code className="text-[10px] text-slate-500 bg-slate-900 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">tsaChainHashes</code>
-                                </div>
-                                <p className="text-xs text-slate-400">RFC 3161 only. Timestamp Authority certificate chain hashes</p>
-                            </div>
+                            ))}
                         </div>
                     </div>
 
@@ -261,7 +258,7 @@ const ZkVerifierDetails: React.FC = () => {
                             <Cpu size={16} /> Timestamp Proof
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {OUTPUT_FIELDS.filter(f => [8, 9, 10, 11].includes(f.id)).map((field) => (
+                            {OUTPUT_FIELDS.filter(f => [7, 9, 10, 11].includes(f.id)).map((field) => (
                                 <div key={field.id} className="bg-slate-950/50 p-3 rounded-lg border border-slate-800 hover:border-slate-600 transition-colors group">
                                     <div className="flex justify-between items-start mb-1">
                                         <h5 className="font-semibold text-slate-200 text-sm">{field.label}</h5>

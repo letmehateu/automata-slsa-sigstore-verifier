@@ -4,11 +4,9 @@ import OverviewDiagram from './components/OverviewDiagram';
 import GitHubIntegration from './components/GitHubIntegration';
 import ZkVerifierDetails from './components/ZkVerifierDetails';
 import CodeIntegration from './components/CodeIntegration';
-import ChatInterface from './components/ChatInterface';
-import { ShieldCheck, ChevronDown, Github, Terminal, Menu, X } from 'lucide-react';
+import { ChevronDown, Terminal, Menu, X } from 'lucide-react';
 
 const App: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<SectionId>(SectionId.HERO);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Add smooth scrolling behavior
@@ -27,7 +25,6 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-8 h-8 text-orange-500" />
               <span className="font-bold text-xl tracking-tight text-white"><span className="text-orange-400">Automata</span> Sigstore Attest</span>
             </div>
 
@@ -176,17 +173,6 @@ const App: React.FC = () => {
               <CodeIntegration />
             </div>
         </section>
-
-        {/* AI FAQ */}
-        {/* <section id="faq" className="py-20 bg-slate-900 border-t border-slate-800 scroll-mt-16">
-             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-10">
-                    <h2 className="text-2xl font-bold text-white mb-2">Still have questions?</h2>
-                    <p className="text-slate-400">Ask our AI assistant about specifics regarding Fulcio, Rekor, or the zkVM implementation.</p>
-                </div>
-                <ChatInterface />
-             </div>
-        </section> */}
 
         <footer className="bg-slate-950 py-12 border-t border-slate-800 text-center">
             <p className="text-slate-500 text-sm">© 2025 Sigstore Attest. Built for the community.</p>
