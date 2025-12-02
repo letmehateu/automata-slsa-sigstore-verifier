@@ -51,9 +51,7 @@ fn test_verify_rfc3161_bundle() {
     use sigstore_verifier::fetcher::jsonl::parser::{
         load_trusted_root_from_jsonl, select_certificate_authority, select_timestamp_authority,
     };
-    use sigstore_verifier::parser::bundle::{
-        extract_bundle_timestamp, parse_bundle_from_path,
-    };
+    use sigstore_verifier::parser::bundle::{extract_bundle_timestamp, parse_bundle_from_path};
 
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
@@ -70,8 +68,8 @@ fn test_verify_rfc3161_bundle() {
     trusted_root_path.pop();
     trusted_root_path.pop();
     trusted_root_path.push("samples/trusted_root.jsonl");
-    let trusted_root_content = std::fs::read_to_string(&trusted_root_path)
-        .expect("Failed to read trusted root file");
+    let trusted_root_content =
+        std::fs::read_to_string(&trusted_root_path).expect("Failed to read trusted root file");
     let trust_roots = load_trusted_root_from_jsonl(&trusted_root_content)
         .expect("Failed to parse trusted root JSONL");
 
