@@ -233,6 +233,11 @@ cargo run -p pico-host --release -- prove --bundle ./attestation.json --trust-ro
                       {/* Timestamp Proof */}
                       <tr>
                         <td className="py-3 pr-4 font-semibold text-white">Timestamp Proof</td>
+                        <td className="py-3 pr-4 font-mono text-orange-400">signing_time</td>
+                        <td className="py-3 text-zinc-400">The UNIX timestamp in seconds when the DSSE Payload is signed.</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 pr-4"></td>
                         <td className="py-3 pr-4 font-mono text-orange-400">tsa_certs</td>
                         <td className="py-3 text-zinc-400">RFC 3161 only. Array of SHA256 certificate hashes, leaf first, root last.</td>
                       </tr>
@@ -244,17 +249,17 @@ cargo run -p pico-host --release -- prove --bundle ./attestation.json --trust-ro
                       <tr>
                         <td className="py-3 pr-4"></td>
                         <td className="py-3 pr-4 font-mono text-orange-400">log_id</td>
-                        <td className="py-3 text-zinc-400">Unique ID of the transparency log.</td>
+                        <td className="py-3 text-zinc-400">Rekor only. The SHA256 hash of Rekor's public key (identifies the log instance).</td>
                       </tr>
                       <tr>
                         <td className="py-3 pr-4"></td>
                         <td className="py-3 pr-4 font-mono text-orange-400">log_index</td>
-                        <td className="py-3 text-zinc-400">Position in the log.</td>
+                        <td className="py-3 text-zinc-400">Rekor only. The tree leaf index (for Merkle proof verification).</td>
                       </tr>
                       <tr>
                         <td className="py-3 pr-4"></td>
-                        <td className="py-3 pr-4 font-mono text-orange-400">integrated_time</td>
-                        <td className="py-3 text-zinc-400">The exact timestamp when the entry is included in the Rekor Log Merkle Tree.</td>
+                        <td className="py-3 pr-4 font-mono text-orange-400">entry_index</td>
+                        <td className="py-3 text-zinc-400">Rekor only. The entry index (for API queries to fetch the full entry).</td>
                       </tr>
                     </tbody>
                   </table>

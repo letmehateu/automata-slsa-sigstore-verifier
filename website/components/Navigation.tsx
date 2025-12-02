@@ -14,7 +14,7 @@ const Navigation: React.FC = () => {
   }, []);
 
   const links = [
-    { label: 'Overview', href: '#overview' },
+    { label: 'Overview', href: '#protocol' },
     { label: 'Get Started', href: '#bundles' },
     { label: 'ZK Verification', href: '#verifier' },
     { label: 'Integration', href: '#integration' },
