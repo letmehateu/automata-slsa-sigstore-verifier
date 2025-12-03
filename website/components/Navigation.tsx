@@ -45,7 +45,7 @@ const Navigation: React.FC = () => {
         <a href="#" className="flex items-center gap-2 group">
           <div className="font-sans font-bold text-xl tracking-tight">
             <span className="text-orange-500 group-hover:text-orange-400 transition-colors">Automata</span>
-            <span className="text-white ml-2">Sigstore Attest</span>
+            <span className="text-white ml-2">SLSA Attestation</span>
           </div>
         </a>
 

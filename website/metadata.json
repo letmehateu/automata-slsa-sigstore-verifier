@@ -1,5 +1,5 @@
 {
-  "name": "Automata Sigstore Attest",
+  "name": "Automata SLSA Attestation with Sigstore",
   "description": "A high-end, monochrome aesthetic documentation site for Automata's Sigstore Attestation protocol featuring procedural halftone visualization.",
   "requestFramePermissions": []
 }

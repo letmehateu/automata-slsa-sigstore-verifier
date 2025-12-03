@@ -35,7 +35,7 @@ const Hero: React.FC = () => {
 
         <p className="text-lg md:text-xl text-zinc-400 max-w-xl leading-relaxed mb-10 font-light">
           The missing link between GitHub Actions and Smart Contracts.
-          We verify Sigstore SLSA attestations inside zkVMs to bring software supply chain security to the blockchain.
+          We verify SLSA Attestations using Sigstore inside zkVMs to bring software supply chain security to the blockchain.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">

@@ -116,10 +116,10 @@ const ProtocolOverview: React.FC = () => {
         <div className="mb-12 md:mb-16">
           <div className="flex items-center gap-2 mb-4 text-orange-500">
             <ShieldCheck size={20} />
-            <span className="font-mono text-xs md:text-sm uppercase tracking-widest">Sigstore Protocol Overview</span>
+            <span className="font-mono text-xs md:text-sm uppercase tracking-widest">Protocol Overview</span>
           </div>
           <p className="text-lg md:text-2xl text-zinc-300 max-w-4xl font-light">
-            The Sigstore protocol democratizes software signing. It allows developers to sign code securely using their existing identity, creating a verifiable, tamper-proof record of software provenance.
+            SLSA + Sigstore protocol democratizes software signing. It allows developers to sign code securely using their existing identity, creating a verifiable, tamper-proof record of software provenance.
           </p>
         </div>
 

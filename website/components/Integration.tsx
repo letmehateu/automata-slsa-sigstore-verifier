@@ -47,7 +47,7 @@ const Integration: React.FC = () => {
                   language="toml"
                   title="Cargo.toml"
                   code={`[dependencies]
-sigstore-verifier = { git = "https://github.com/automata-network/automata-attest-build-verifier" }`}
+sigstore-verifier = { git = "https://github.com/automata-network/automata-slsa-sigstore-verifier" }`}
                  />
                </div>
                <div>
@@ -113,7 +113,7 @@ fn main() {
                  <CodeBlock
                   language="bash"
                   title="Terminal"
-                  code={`forge install automata-network/automata-attest-build-verifier`}
+                  code={`forge install automata-network/automata-slsa-sigstore-verifier`}
                  />
                </div>
                <div className="mb-6 md:mb-8">
@@ -121,7 +121,7 @@ fn main() {
                  <CodeBlock
                   language="text"
                   title="remappings.txt"
-                  code={`@automata-network/automata-attest-build-verifier/=lib/automata-attest-build-verifier/contracts/src/`}
+                  code={`@automata-network/automata-slsa-sigstore-verifier/=lib/automata-slsa-sigstore-verifier/contracts/src/`}
                  />
                </div>
                <div>
@@ -135,11 +135,11 @@ pragma solidity ^0.8.0;
 import {
     ISigstoreAttestationVerifier,
     ZkCoProcessorType
-} from "@automata-network/automata-attest-build-verifier/interfaces/ISigstoreAttestationVerifier.sol";
+} from "@automata-network/automata-slsa-sigstore-verifier/interfaces/ISigstoreAttestationVerifier.sol";
 import {
     VerificationResult,
     VerificationResultParser
-} from "@automata-network/automata-attest-build-verifier/Types.sol";
+} from "@automata-network/automata-slsa-sigstore-verifier/Types.sol";
 
 contract MyContract {
     using VerificationResultParser for bytes;
