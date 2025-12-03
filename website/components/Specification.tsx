@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CodeBlock from './ui/CodeBlock';
-import { FileJson, Key, Shield, Clock, Lock, Globe, FileBadge, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { FileJson, Key, Shield, Clock, Lock, Globe, FileBadge, ChevronLeft, ChevronRight, ChevronDown, GitBranch } from 'lucide-react';
 
 type SubsectionId = 'slsa' | 'oidc-fulcio' | 'timestamping';
 
@@ -584,6 +584,10 @@ const TimestampingContent: React.FC = () => (
           </thead>
           <tbody className="divide-y divide-zinc-800/50 text-zinc-300">
             <tr>
+              <td className="py-3 pr-4 font-mono text-orange-400">Policy OID</td>
+              <td className="py-3 text-zinc-400">Identifies the TSA's timestamping policy and legal obligations</td>
+            </tr>
+            <tr>
               <td className="py-3 pr-4 font-mono text-orange-400">messageImprint</td>
               <td className="py-3 text-zinc-400">Hash of the DSSE signature being timestamped (SHA256)</td>
             </tr>
@@ -613,123 +617,7 @@ const TimestampingContent: React.FC = () => (
     </div>
 
     {/* Rekor Section */}
-    <div className="mb-12">
-      <div className="flex items-center gap-3 mb-4">
-        <Globe className="w-5 h-5 text-emerald-500" />
-        <h4 className="text-lg md:text-xl font-bold text-white">Rekor Transparency Log</h4>
-        <span className="text-xs font-mono text-zinc-500 uppercase">Public Timestamping</span>
-      </div>
-      <p className="text-sm text-zinc-400 mb-6 max-w-3xl">
-        Rekor is an immutable, append-only ledger that records signing events in a publicly auditable log. Built on a Merkle tree data structure, it provides cryptographic guarantees that entries cannot be modified or deleted.
-      </p>
-
-      {/* Merkle Tree Explanation */}
-      <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-8">
-        <div className="p-6 border border-zinc-800 bg-zinc-900/20 rounded-lg">
-          <h5 className="text-white font-bold mb-4">Merkle Tree Structure</h5>
-          <p className="text-sm text-zinc-400 mb-4">
-            A Merkle tree is a binary tree where each leaf node contains a hash of data, and each internal node contains a hash of its children. The root hash cryptographically commits to the entire tree contents.
-          </p>
-          <pre className="font-mono text-xs text-zinc-400 bg-zinc-950 p-4 rounded overflow-x-auto">
-{`                [Root Hash]
-                /          \\
-         [H(AB)]            [H(CD)]
-         /    \\              /    \\
-      [H(A)] [H(B)]      [H(C)] [H(D)]
-        |      |           |      |
-     Entry   Entry      Entry   Entry
-       1       2          3       4`}
-          </pre>
-        </div>
-
-        <div className="p-6 border border-zinc-800 bg-zinc-900/20 rounded-lg">
-          <h5 className="text-white font-bold mb-4">Properties</h5>
-          <div className="space-y-4">
-            <div>
-              <span className="text-orange-500 font-semibold text-sm">Tamper-Evident</span>
-              <p className="text-xs text-zinc-500">Any change to any entry changes the root hash</p>
-            </div>
-            <div>
-              <span className="text-orange-500 font-semibold text-sm">Append-Only</span>
-              <p className="text-xs text-zinc-500">New entries are added as leaves; existing entries cannot be modified</p>
-            </div>
-            <div>
-              <span className="text-orange-500 font-semibold text-sm">Efficient Verification</span>
-              <p className="text-xs text-zinc-500">Verify entry membership with O(log n) hashes instead of downloading entire log</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Inclusion & Consistency Proofs */}
-      <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-8">
-        <div className="p-6 border border-zinc-800 bg-zinc-900/20 rounded-lg">
-          <h5 className="text-white font-bold mb-4">Inclusion Proofs</h5>
-          <p className="text-sm text-zinc-400 mb-4">
-            An inclusion proof demonstrates that a specific entry exists in the log without downloading the entire tree.
-          </p>
-          <div className="overflow-x-auto">
-            <div className="text-xs text-zinc-500 space-y-1 font-mono bg-zinc-950 p-3 rounded min-w-[280px]">
-              <p>To prove Entry 2 is in the tree:</p>
-              <p className="text-zinc-400">1. Provide: H(A), H(CD), and Entry 2</p>
-              <p className="text-zinc-400">2. Compute: H(B) from Entry 2</p>
-              <p className="text-zinc-400">3. Compute: H(AB) = H(H(A) || H(B))</p>
-              <p className="text-zinc-400">4. Compute: Root = H(H(AB) || H(CD))</p>
-              <p className="text-emerald-400">5. Match root → Entry is included</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6 border border-zinc-800 bg-zinc-900/20 rounded-lg">
-          <h5 className="text-white font-bold mb-4">Consistency Proofs</h5>
-          <p className="text-sm text-zinc-400 mb-4">
-            Consistency proofs verify that the log is truly append-only—that no entries have been modified, deleted, or reordered.
-          </p>
-          <div className="text-xs text-zinc-500 space-y-1">
-            <p className="text-zinc-300 mb-2">Auditors continuously monitor the log by:</p>
-            <p>1. Fetching the current root hash (signed by Rekor)</p>
-            <p>2. Requesting a consistency proof from the previous root</p>
-            <p>3. Verifying the old tree is a prefix of the new tree</p>
-            <p>4. Alerting if any inconsistency is detected</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Rekor Entry Contents */}
-      <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-        <h5 className="text-white font-bold mb-4">Rekor Entry Contents</h5>
-        <table className="w-full text-left text-xs md:text-sm border-collapse min-w-[500px]">
-          <thead>
-            <tr className="border-b border-zinc-800 text-zinc-500 font-mono text-xs uppercase">
-              <th className="py-3 pr-4">Field</th>
-              <th className="py-3">Description</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-800/50 text-zinc-300">
-            <tr>
-              <td className="py-3 pr-4 font-mono text-orange-400">logId</td>
-              <td className="py-3 text-zinc-400">SHA256 hash of Rekor's public key (identifies the log instance)</td>
-            </tr>
-            <tr>
-              <td className="py-3 pr-4 font-mono text-orange-400">logIndex</td>
-              <td className="py-3 text-zinc-400">Tree leaf index used for Merkle proof verification</td>
-            </tr>
-            <tr>
-              <td className="py-3 pr-4 font-mono text-orange-400">integratedTime</td>
-              <td className="py-3 text-zinc-400">Unix timestamp when the entry was added to the log</td>
-            </tr>
-            <tr>
-              <td className="py-3 pr-4 font-mono text-orange-400">inclusionProof</td>
-              <td className="py-3 text-zinc-400">Array of hashes needed to verify entry exists in the tree</td>
-            </tr>
-            <tr>
-              <td className="py-3 pr-4 font-mono text-orange-400">signedEntryTimestamp</td>
-              <td className="py-3 text-zinc-400">Rekor's signature over the log entry, proving it was recorded</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <RekorSection />
 
     {/* Comparison Table */}
     <div>
@@ -790,5 +678,268 @@ const TimestampingContent: React.FC = () => (
     </div>
   </div>
 );
+
+/* ==================== REKOR SECTION COMPONENT ==================== */
+const RekorSection: React.FC = () => {
+  const [isMerkleTreeExpanded, setIsMerkleTreeExpanded] = useState(false);
+
+  return (
+    <div className="mb-12">
+      <div className="flex items-center gap-3 mb-4">
+        <Globe className="w-5 h-5 text-emerald-500" />
+        <h4 className="text-lg md:text-xl font-bold text-white">Rekor Transparency Log</h4>
+        <span className="text-xs font-mono text-zinc-500 uppercase">Public Timestamping</span>
+      </div>
+      <p className="text-sm text-zinc-400 mb-6 max-w-3xl">
+        Rekor is an immutable, append-only ledger that records signing events in a publicly auditable log. Built on a Merkle tree data structure, it provides cryptographic guarantees that entries cannot be modified or deleted.
+      </p>
+
+      {/* Entry Body Structure Card */}
+      <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-8">
+        <div>
+          <h5 className="text-white font-bold mb-4">Entry Body Structure (DSSE Type)</h5>
+          <p className="text-sm text-zinc-500 mb-4">
+            When a DSSE signature is logged, Rekor stores it in a canonical format containing hashes of the envelope rather than the full data. This structure is what gets included in the Merkle tree.
+          </p>
+          <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+            <div className="min-w-[320px]">
+              <CodeBlock
+                language="json"
+                title="RekorDSSEEntry"
+                code={`{
+  "apiVersion": "0.0.1",
+  "kind": "dsse",
+  "spec": {
+    "envelopeHash": {
+      "algorithm": "sha256",
+      "value": "<SHA256(DSSE-envelope-JSON)>"
+    },
+    "payloadHash": {
+      "algorithm": "sha256",
+      "value": "<SHA256(in-toto-payload)>"
+    },
+    "signatures": [{
+      "signature": "<base64-encoded-DSSE-signature>",
+      "verifier": "<base64-encoded-signing-certificate>"
+    }]
+  }
+}`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Key Components Table */}
+        <div>
+          <h5 className="text-white font-bold mb-4">Key Components</h5>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs md:text-sm border-collapse min-w-[400px]">
+              <thead>
+                <tr className="border-b border-zinc-800 text-zinc-500 font-mono text-xs uppercase">
+                  <th className="py-3 pr-4">Component</th>
+                  <th className="py-3">Description</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/50 text-zinc-300">
+                <tr>
+                  <td className="py-3 pr-4 font-mono text-orange-400">envelopeHash</td>
+                  <td className="py-3 text-zinc-400">SHA256 hash of the entire DSSE envelope JSON (binds the signature to the log)</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-4 font-mono text-orange-400">payloadHash</td>
+                  <td className="py-3 text-zinc-400">SHA256 hash of the in-toto statement payload</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-4 font-mono text-orange-400">signature</td>
+                  <td className="py-3 text-zinc-400">The DSSE signature bytes (same as in <code className="text-amber-300 bg-zinc-900 px-1">dsseEnvelope.signatures</code>)</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-4 font-mono text-orange-400">verifier</td>
+                  <td className="py-3 text-zinc-400">The signing certificate (same as <code className="text-amber-300 bg-zinc-900 px-1">verificationMaterial.certificate</code>)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Signed Entry Timestamp Card */}
+      <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-8">
+        <div className="p-6 border border-zinc-800 bg-zinc-900/20 rounded-lg">
+          <h5 className="text-white font-bold mb-4">Signed Entry Timestamp (SET)</h5>
+          <p className="text-sm text-zinc-400 mb-4">
+            The Signed Entry Timestamp cryptographically binds the integrated time to the entry. It is a signature from Rekor over the concatenation of log metadata and the entry body.
+          </p>
+          <div className="bg-zinc-950 p-4 rounded font-mono text-sm mb-4">
+            <span className="text-zinc-500">SET = </span>
+            <span className="text-emerald-400">Sign</span>
+            <span className="text-zinc-500">_rekor(</span>
+            <span className="text-orange-400">logID</span>
+            <span className="text-zinc-500"> || </span>
+            <span className="text-orange-400">logIndex</span>
+            <span className="text-zinc-500"> || </span>
+            <span className="text-orange-400">body</span>
+            <span className="text-zinc-500"> || </span>
+            <span className="text-orange-400">integratedTime</span>
+            <span className="text-zinc-500">)</span>
+          </div>
+          <p className="text-sm text-zinc-500">
+            Verifying the SET proves: <span className="text-zinc-300">"Rekor attests that this entry was added at this position and time."</span>
+          </p>
+        </div>
+
+        {/* SET Components Table */}
+        <div>
+          <h5 className="text-white font-bold mb-4">SET Components</h5>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs md:text-sm border-collapse min-w-[400px]">
+              <thead>
+                <tr className="border-b border-zinc-800 text-zinc-500 font-mono text-xs uppercase">
+                  <th className="py-3 pr-4">Field</th>
+                  <th className="py-3">Description</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/50 text-zinc-300">
+                <tr>
+                  <td className="py-3 pr-4 font-mono text-orange-400">logID</td>
+                  <td className="py-3 text-zinc-400">SHA256 hash of Rekor's public key (identifies the log instance)</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-4 font-mono text-orange-400">logIndex</td>
+                  <td className="py-3 text-zinc-400">The tree leaf position of this entry</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-4 font-mono text-orange-400">body</td>
+                  <td className="py-3 text-zinc-400">The canonicalized entry body (RekorDSSEEntry above)</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-4 font-mono text-orange-400">integratedTime</td>
+                  <td className="py-3 text-zinc-400">Unix timestamp when Rekor accepted the entry</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Collapsible Merkle Tree Section */}
+      <div className="border border-zinc-800 rounded-lg overflow-hidden">
+        <button
+          onClick={() => setIsMerkleTreeExpanded(!isMerkleTreeExpanded)}
+          className="w-full flex items-center justify-between p-4 md:p-6 bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <GitBranch className="w-5 h-5 text-zinc-500" />
+            <div className="text-left">
+              <h5 className="text-white font-bold">Merkle Tree Structure</h5>
+              <p className="text-xs text-zinc-500 mt-1">Learn how entries are cryptographically verified</p>
+            </div>
+          </div>
+          <ChevronDown
+            size={20}
+            className={`text-zinc-400 transition-transform duration-300 ${
+              isMerkleTreeExpanded ? 'rotate-180' : ''
+            }`}
+          />
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            isMerkleTreeExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="p-4 md:p-6 border-t border-zinc-800 space-y-6">
+            {/* Overview Sub-card */}
+            <div className="p-4 border border-zinc-800/50 bg-zinc-900/20 rounded-lg">
+              <h6 className="text-white font-semibold mb-3">What is a Merkle Tree?</h6>
+              <p className="text-sm text-zinc-400 mb-4">
+                A Merkle tree is a binary tree where each leaf node contains a hash of data, and each internal node contains a hash of its children. The root hash cryptographically commits to the entire tree contents.
+              </p>
+              <pre className="font-mono text-xs text-zinc-400 bg-zinc-950 p-4 rounded overflow-x-auto mb-4">
+{`                [Root Hash]
+                /          \\
+         [H(AB)]            [H(CD)]
+         /    \\              /    \\
+      [H(A)] [H(B)]      [H(C)] [H(D)]
+        |      |           |      |
+     Entry   Entry      Entry   Entry
+       1       2          3       4`}
+              </pre>
+              <div className="bg-zinc-950 p-3 rounded">
+                <p className="text-xs font-mono text-zinc-500 mb-1">Leaf Hash Formula (RFC 6962):</p>
+                <p className="text-sm font-mono">
+                  <span className="text-orange-400">leaf_hash</span>
+                  <span className="text-zinc-500"> = SHA256(</span>
+                  <span className="text-emerald-400">0x00</span>
+                  <span className="text-zinc-500"> || </span>
+                  <span className="text-orange-400">RekorDSSEEntry_bytes</span>
+                  <span className="text-zinc-500">)</span>
+                </p>
+                <p className="text-xs text-zinc-600 mt-2">The 0x00 prefix distinguishes leaf nodes from internal nodes (which use 0x01).</p>
+              </div>
+            </div>
+
+            {/* Properties Sub-card */}
+            <div className="p-4 border border-zinc-800/50 bg-zinc-900/20 rounded-lg">
+              <h6 className="text-white font-semibold mb-3">Properties</h6>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <span className="text-orange-500 font-semibold text-sm">Tamper-Evident</span>
+                  <p className="text-xs text-zinc-500">Any change to any entry changes the root hash</p>
+                </div>
+                <div>
+                  <span className="text-orange-500 font-semibold text-sm">Append-Only</span>
+                  <p className="text-xs text-zinc-500">New entries are added as leaves; existing entries cannot be modified</p>
+                </div>
+                <div>
+                  <span className="text-orange-500 font-semibold text-sm">Efficient Verification</span>
+                  <p className="text-xs text-zinc-500">Verify entry membership with O(log n) hashes</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Inclusion Proofs Sub-card */}
+            <div className="p-4 border border-zinc-800/50 bg-zinc-900/20 rounded-lg">
+              <h6 className="text-white font-semibold mb-3">Inclusion Proofs</h6>
+              <p className="text-sm text-zinc-400 mb-4">
+                An inclusion proof demonstrates that a specific entry exists in the log without downloading the entire tree. The verifier receives the entry plus sibling hashes along the path to the root.
+              </p>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="text-xs text-zinc-500 space-y-1 font-mono bg-zinc-950 p-3 rounded">
+                  <p className="text-zinc-400 mb-2">To prove Entry 2 is in the tree:</p>
+                  <p>1. Provide: H(A), H(CD), and Entry 2</p>
+                  <p>2. Compute: H(B) from Entry 2</p>
+                  <p>3. Compute: H(AB) = H(H(A) || H(B))</p>
+                  <p>4. Compute: Root = H(H(AB) || H(CD))</p>
+                  <p className="text-emerald-400">5. Match root → Entry is included</p>
+                </div>
+                <div className="flex items-center">
+                  <p className="text-sm text-zinc-400">
+                    <span className="text-orange-500 font-semibold">Benefit:</span> Inclusion proofs can be "stapled" to artifacts, enabling offline verification without querying the log.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Consistency Proofs Sub-card */}
+            <div className="p-4 border border-zinc-800/50 bg-zinc-900/20 rounded-lg">
+              <h6 className="text-white font-semibold mb-3">Consistency Proofs</h6>
+              <p className="text-sm text-zinc-400 mb-4">
+                Consistency proofs verify that the log is truly append-only—that no entries have been modified, deleted, or reordered between two points in time.
+              </p>
+              <div className="text-xs text-zinc-500 space-y-1">
+                <p className="text-zinc-300 mb-2">Auditors continuously monitor the log by:</p>
+                <p>1. Fetching the current root hash (signed by Rekor)</p>
+                <p>2. Requesting a consistency proof from the previous root</p>
+                <p>3. Verifying the old tree is a prefix of the new tree</p>
+                <p>4. Alerting if any inconsistency is detected</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Specification;
