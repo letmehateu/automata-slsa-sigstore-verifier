@@ -75,9 +75,8 @@ contract ConfigScript is Script, Config {
 
         // 3. Send the transaction
         vm.startBroadcast();
-        SigstoreAttestationVerifier(contractAddr).setZkCoProcessorConfig(
-            ZkCoProcessorType.RiscZero, imageId, verifierAddr
-        );
+        SigstoreAttestationVerifier(contractAddr)
+            .setZkCoProcessorConfig(ZkCoProcessorType.RiscZero, imageId, verifierAddr);
         vm.stopBroadcast();
 
         console2.log("RiscZero configured successfully!");
@@ -116,9 +115,7 @@ contract ConfigScript is Script, Config {
 
         // 3. Send the transaction
         vm.startBroadcast();
-        SigstoreAttestationVerifier(contractAddr).setZkCoProcessorConfig(
-            ZkCoProcessorType.Succinct, vkey, verifierAddr
-        );
+        SigstoreAttestationVerifier(contractAddr).setZkCoProcessorConfig(ZkCoProcessorType.Succinct, vkey, verifierAddr);
         vm.stopBroadcast();
 
         console2.log("SP1 configured successfully!");
@@ -157,9 +154,7 @@ contract ConfigScript is Script, Config {
 
         // 3. Send the transaction
         vm.startBroadcast();
-        SigstoreAttestationVerifier(contractAddr).setZkCoProcessorConfig(
-            ZkCoProcessorType.Pico, vkey, verifierAddr
-        );
+        SigstoreAttestationVerifier(contractAddr).setZkCoProcessorConfig(ZkCoProcessorType.Pico, vkey, verifierAddr);
         vm.stopBroadcast();
 
         console2.log("Pico configured successfully!");
@@ -183,9 +178,8 @@ contract ConfigScript is Script, Config {
 
             if (imageId != bytes32(0) && verifierAddr != address(0)) {
                 console2.log("  Configuring RiscZero...");
-                SigstoreAttestationVerifier(contractAddr).setZkCoProcessorConfig(
-                    ZkCoProcessorType.RiscZero, imageId, verifierAddr
-                );
+                SigstoreAttestationVerifier(contractAddr)
+                    .setZkCoProcessorConfig(ZkCoProcessorType.RiscZero, imageId, verifierAddr);
             }
         }
 
@@ -196,9 +190,8 @@ contract ConfigScript is Script, Config {
 
             if (vkey != bytes32(0) && verifierAddr != address(0)) {
                 console2.log("  Configuring SP1...");
-                SigstoreAttestationVerifier(contractAddr).setZkCoProcessorConfig(
-                    ZkCoProcessorType.Succinct, vkey, verifierAddr
-                );
+                SigstoreAttestationVerifier(contractAddr)
+                    .setZkCoProcessorConfig(ZkCoProcessorType.Succinct, vkey, verifierAddr);
             }
         }
 
@@ -209,9 +202,8 @@ contract ConfigScript is Script, Config {
 
             if (vkey != bytes32(0) && verifierAddr != address(0)) {
                 console2.log("  Configuring Pico...");
-                SigstoreAttestationVerifier(contractAddr).setZkCoProcessorConfig(
-                    ZkCoProcessorType.Pico, vkey, verifierAddr
-                );
+                SigstoreAttestationVerifier(contractAddr)
+                    .setZkCoProcessorConfig(ZkCoProcessorType.Pico, vkey, verifierAddr);
             }
         }
 

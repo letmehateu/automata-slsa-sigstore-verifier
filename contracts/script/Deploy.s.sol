@@ -200,9 +200,7 @@ contract Deploy is Script, Config {
             console2.log("    Verifier:", cfg.picoVerifier);
             console2.log("    VKey:", vm.toString(globalConfig.picoVkey));
 
-            attestationVerifier.setZkCoProcessorConfig(
-                ZkCoProcessorType.Pico, globalConfig.picoVkey, cfg.picoVerifier
-            );
+            attestationVerifier.setZkCoProcessorConfig(ZkCoProcessorType.Pico, globalConfig.picoVkey, cfg.picoVerifier);
 
             result.picoConfigured = true;
         }
