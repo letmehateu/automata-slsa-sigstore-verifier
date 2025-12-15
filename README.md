@@ -284,7 +284,7 @@ pub struct ProofArtifact {
 
 For comprehensive documentation, tutorials, and API references, visit the project site:
 
-**[https://automata-network.github.io/automata-slsa-sigstore-verifier/](https://automata-network.github.io/automata-slsa-sigstore-verifier/)**
+**[https://www.proofofbuild.xyz/](https://www.proofofbuild.xyz/)**
 
 ## License
 
