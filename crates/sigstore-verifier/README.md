@@ -39,7 +39,7 @@ use sigstore_verifier::{AttestationVerifier, VerificationOptions, CertificateCha
 let verifier = AttestationVerifier;
 
 // Prepare Fulcio certificate chain
-let felco_ca_chain = CertificateChain {
+let fulcio_ca_chain = CertificateChain {
     leaf: leaf_cert_der,
     intermediates: vec![intermediate_cert_der],
     root: root_cert_der,
